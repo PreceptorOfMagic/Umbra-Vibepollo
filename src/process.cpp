@@ -2974,17 +2974,21 @@ namespace proc {
         // do not resize/crop the captured desktop or change an active stream.
         BOOST_LOG(info) << "[AURORA-GPU-HEVC] rebuilding paused virtual display for "
           << session.width << "x" << vd_height << " after resize rc=" << result;
-        if (!VDISPLAY::removeVirtualDisplay(_launch_session->display_guid)) return false;
+        // Vibepollo: the display's identity is proc_t::_virtual_display_guid, and createVirtualDisplay returns
+        // a creation result (display name optional) and takes the client's HDR profile.
+        if (!VDISPLAY::removeVirtualDisplay(_virtual_display_guid)) return false;
         uuid_util::uuid_t identity;
-        memcpy(&identity, &_launch_session->display_guid, sizeof(GUID));
+        memcpy(&identity, &_virtual_display_guid, sizeof(GUID));
         const std::string device_name = _app.use_app_identity ? _app.name : _launch_session->device_name;
-        name = VDISPLAY::createVirtualDisplay(identity.string().c_str(), device_name.c_str(),
-          session.width, vd_height, fps, _launch_session->display_guid);
-        if (name.empty()) return false;
+        const char *hdr_profile = _launch_session->hdr_profile ? _launch_session->hdr_profile->c_str() : nullptr;
+        auto created = VDISPLAY::createVirtualDisplay(identity.string().c_str(), device_name.c_str(), hdr_profile,
+          session.width, vd_height, fps, _virtual_display_guid);
+        if (!created || !created->display_name || created->display_name->empty()) return false;
+        name = *created->display_name;
         display_name = platf::to_utf8(name);
-        config::video.output_name = display_device::map_display_name(display_name);
+        config::video.output_name = display_name;
         result = VDISPLAY::changeDisplaySettings(name.c_str(), session.width, vd_height, fps);
-        display_device::reset_persistence();
+        display_helper_integration::reset_persistence();
       }
       mode = {}; mode.dmSize = sizeof(mode);
       if (result != ERROR_SUCCESS || !EnumDisplaySettingsW(name.c_str(), ENUM_CURRENT_SETTINGS, &mode) ||
