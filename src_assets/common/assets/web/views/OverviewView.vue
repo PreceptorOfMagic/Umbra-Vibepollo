@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import LinuxCaptureStatus from '@/components/settings/LinuxCaptureStatus.vue';
+import UmbraCard from '@/umbra/UmbraCard.vue';  // Umbra
 import { ApiError, apiGet } from '@/api/client';
 import {
   AppButton,
@@ -508,6 +509,7 @@ onBeforeUnmount(() => {
           </RouterLink>
         </section>
       </div>
+      <UmbraCard />  <!-- Umbra: this edition's version, update notice, links and legal -->
       <LinuxCaptureStatus
         v-if="system.metadata?.platform === 'linux'"
         :metadata="system.metadata"
@@ -524,13 +526,13 @@ onBeforeUnmount(() => {
         >
         <nav :aria-label="t('ui.overview.support')">
           <a
-            href="https://github.com/Nonary/Vibepollo/issues/new/choose"
+            href="https://github.com/PreceptorOfMagic/Umbra-Vibepollo/issues/new/choose"
             target="_blank"
             rel="noopener noreferrer"
             >{{ t('ui.overview.actions.reportBug') }}<UiIcon name="external-link" :size="14"
           /></a>
           <a
-            href="https://github.com/Nonary/Vibepollo/releases/latest"
+            href="https://github.com/PreceptorOfMagic/Umbra-Vibepollo/releases/latest"
             target="_blank"
             rel="noopener noreferrer"
             >{{ t('ui.overview.actions.checkUpdates') }}<UiIcon name="external-link" :size="14"

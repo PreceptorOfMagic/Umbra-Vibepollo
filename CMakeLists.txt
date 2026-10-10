@@ -4,9 +4,11 @@ cmake_minimum_required(VERSION 3.20)
 # `cmake_path(CONVERT ... TO_NATIVE_PATH_LIST ...)` requires 3.20
 # todo - set this conditionally
 
-project(Vibepollo VERSION 0.0.0
-        DESCRIPTION "Self-hosted game stream host for Moonlight"
-        HOMEPAGE_URL "https://github.com/Nonary/Vibepollo")
+# Umbra: the Vibepollo-based edition of Umbra. The name is file-safe because it reaches the .rc file,
+# compile definitions and the tray tooltip; installer and UI surfaces say "Umbra (Vibepollo)".
+project(Umbra-Vibepollo VERSION 0.0.0
+        DESCRIPTION "Self-hosted game stream host for Eclipse"
+        HOMEPAGE_URL "https://github.com/PreceptorOfMagic/Umbra-Vibepollo")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,12 +22,12 @@ set(PROJECT_LICENSE "GPL-3.0-only")
 set(PROJECT_FQDN "io.github.Nonary.vibepollo")
 set(WINDOWS_APP_USER_MODEL_ID "Nonary.Vibepollo")
 
-set(PROJECT_BRIEF_DESCRIPTION "GameStream host for Artemis")  # must be <= 35 characters
+set(PROJECT_BRIEF_DESCRIPTION "GameStream host for Eclipse")  # must be <= 35 characters
 
 set(PROJECT_LONG_DESCRIPTION "Offering low latency, cloud gaming server capabilities with support for AMD, Intel, \
-and Nvidia GPUs for hardware encoding. Software encoding is also available. You can connect to Apollo from any \
-Artemis client on a variety of devices. A web UI and configuration API are available for configuration, client \
-pairing, and integrations.")
+and Nvidia GPUs for hardware encoding. Software encoding is also available. You can connect to Umbra from Eclipse \
+or another Moonlight-compatible client on a variety of devices. A web UI is provided for configuration and pairing from \
+your favorite web browser. Pair from the local server or any mobile device.")
 
 # Ensure WiX-specific CPack variables are present early in config generation
 if (WIN32)

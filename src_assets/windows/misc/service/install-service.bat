@@ -13,14 +13,16 @@ rem Set service to demand start. It will be changed to auto later if the user se
 set SERVICE_START_TYPE=demand
 
 rem Remove the legacy SunshineSvc service
-net stop sunshinesvc
-sc delete sunshinesvc
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0service-control.ps1" -Name SunshineSvc -Action Remove -ExpectedPath "%SERVICE_BIN%"
+if errorlevel 1 exit /b 1
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0service-control.ps1" -Name ApolloService -Action Stop -ExpectedPath "%SERVICE_BIN%"
+if errorlevel 1 exit /b 1
 
 rem Check if ApolloService already exists
 sc qc %SERVICE_NAME% > nul 2>&1
 if %ERRORLEVEL%==0 (
     rem Stop the existing service if running
-    net stop %SERVICE_NAME%
+    rem Already verified and stopped by service-control.ps1.
 
     rem Reconfigure the existing service
     set SC_CMD=config
@@ -64,4 +66,16 @@ rem Set the description of the service
 sc description %SERVICE_NAME% "Apollo is a self-hosted game stream host for Moonlight."
 
 rem Start the new service
-net start %SERVICE_NAME%
+if not "%SERVICE_START_TYPE%"=="disabled" (
+    net start %SERVICE_NAME%
+    if errorlevel 1 exit /b 1
+)
+
+rem Umbra: the name shown in Services. Set after Apollo's own lines, not in them, so Apollo's
+rem edits to its sc command keep merging cleanly. The service key stays ApolloService.
+sc config %SERVICE_NAME% DisplayName= "Umbra (Vibepollo) Host Service"
+if errorlevel 1 exit /b 1
+sc description %SERVICE_NAME% "Umbra is a self-hosted game stream host for Moonlight and Eclipse, based on Vibepollo."
+
+if errorlevel 1 exit /b 1
+exit /b 0

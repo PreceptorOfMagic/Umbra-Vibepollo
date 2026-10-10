@@ -116,6 +116,10 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/confighttp.h"
         "${CMAKE_SOURCE_DIR}/src/webrtc_stream.cpp"
         "${CMAKE_SOURCE_DIR}/src/webrtc_stream.h"
+        # BETA-ONLY, REMOVE FOR RELEASE -- see src/beta_profile.h. Compiled out entirely unless
+        # APOLLO_BETA_PROFILE is defined (below), so a release build carries none of it.
+        "${CMAKE_SOURCE_DIR}/src/beta_profile.cpp"
+        "${CMAKE_SOURCE_DIR}/src/beta_profile.h"
         "${CMAKE_SOURCE_DIR}/src/rtsp.cpp"
         "${CMAKE_SOURCE_DIR}/src/rtsp.h"
         "${CMAKE_SOURCE_DIR}/src/stream.cpp"
@@ -141,6 +145,10 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/audio.h"
         "${CMAKE_SOURCE_DIR}/src/audio_policy.cpp"
         "${CMAKE_SOURCE_DIR}/src/audio_policy.h"
+        "${CMAKE_SOURCE_DIR}/src/wired_pin.cpp"
+        "${CMAKE_SOURCE_DIR}/src/wired_pin.h"
+        "${CMAKE_SOURCE_DIR}/src/host_monitor.cpp"
+        "${CMAKE_SOURCE_DIR}/src/host_monitor.h"
         "${CMAKE_SOURCE_DIR}/src/platform/common.h"
         "${CMAKE_SOURCE_DIR}/src/platform/common_services.cpp"
         "${CMAKE_SOURCE_DIR}/src/platform/common_services.h"
@@ -225,6 +233,19 @@ endif()
 list(APPEND SUNSHINE_DEFINITIONS SUNSHINE_ASSETS_DIR="${SUNSHINE_ASSETS_DIR_DEF}")
 
 list(APPEND SUNSHINE_DEFINITIONS SUNSHINE_TRAY=${SUNSHINE_TRAY})
+
+# BETA-ONLY, REMOVE FOR RELEASE -- src/beta_profile.h.
+# Lets ONE Umbra host answer the live and the Eclipse Beta client with different settings, because two
+# Umbra instances cannot run on one host (fixed ports, one capture device, one virtual display).
+# OFF makes the feature vanish at compile time: both hooks are #ifdef'd and the translation unit
+# has no other callers.
+#     cmake -DAPOLLO_BETA_PROFILE=OFF     <- the release build
+# Umbra (Vibepollo): OFF -- the beta profile hooks were not carried into Vibepollo's launch/RTSP code.
+option(APOLLO_BETA_PROFILE "BETA-ONLY: per-client config overrides for the Eclipse Beta client" OFF)
+if (APOLLO_BETA_PROFILE)
+    list(APPEND SUNSHINE_DEFINITIONS APOLLO_BETA_PROFILE=1)
+    message(STATUS "APOLLO_BETA_PROFILE is ON -- this is a BETA build, not a release build")
+endif ()
 
 # Publisher metadata
 list(APPEND SUNSHINE_DEFINITIONS SUNSHINE_PUBLISHER_NAME="${SUNSHINE_PUBLISHER_NAME}")

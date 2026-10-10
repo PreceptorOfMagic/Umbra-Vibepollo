@@ -1,4 +1,5 @@
 import { createI18n, type LocaleMessageValue } from 'vue-i18n';
+import { applyUmbraIdentity } from '@/umbra/identity';  // Umbra: name + own wording, see that file
 
 type LocaleMessages = Record<string, LocaleMessageValue>;
 
@@ -84,6 +85,7 @@ export async function createVibepolloI18n() {
     }
   }
 
+  for (const locale of Object.keys(messages)) messages[locale] = applyUmbraIdentity(messages[locale], locale);  // Umbra
   document.documentElement.lang = activeLocale;
   return createI18n({
     legacy: false,

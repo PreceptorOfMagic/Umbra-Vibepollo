@@ -77,3 +77,6 @@ AGENTS.md
 test_sunshine.log
 vibeshine_state.json
 .claude/
+
+# local scratch copies of source files (never commit)
+*.bak-*

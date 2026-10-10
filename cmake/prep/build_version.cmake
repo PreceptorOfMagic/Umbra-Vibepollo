@@ -26,8 +26,10 @@ endif()
 
 # Allow forks / CI to override which GitHub repo is used for update checks.
 # Cache variables can be provided via -DSUNSHINE_REPO_OWNER=... or -DSUNSHINE_REPO_NAME=...
-set(SUNSHINE_REPO_OWNER "Nonary" CACHE STRING "GitHub repo owner for update checks")
-set(SUNSHINE_REPO_NAME "vibepollo" CACHE STRING "GitHub repo name for update checks")
+# Umbra: update checks follow Umbra (Vibepollo)'s own releases, not Vibepollo's -- a Vibepollo release
+# offered here would replace Umbra's co-op host with one that lacks it.
+set(SUNSHINE_REPO_OWNER "PreceptorOfMagic" CACHE STRING "GitHub repo owner for update checks")
+set(SUNSHINE_REPO_NAME "Umbra-Vibepollo" CACHE STRING "GitHub repo name for update checks")
 
 # Allow environment variables to override the cache values (useful in CI)
 if(DEFINED ENV{SUNSHINE_REPO_OWNER})
@@ -38,7 +40,7 @@ if(DEFINED ENV{SUNSHINE_REPO_NAME})
 endif()
 
 # Try to infer owner/name from the clone URL when available and the defaults are still in use
-if(DEFINED GITHUB_CLONE_URL AND (SUNSHINE_REPO_OWNER STREQUAL "Nonary" OR SUNSHINE_REPO_NAME STREQUAL "vibepollo"))
+if(DEFINED GITHUB_CLONE_URL AND (SUNSHINE_REPO_OWNER STREQUAL "PreceptorOfMagic" OR SUNSHINE_REPO_NAME STREQUAL "Umbra-Vibepollo"))
     string(REGEX MATCH "github.com[:/]+([^/]+)/([^/]+)(\\.git)?$" _match "${GITHUB_CLONE_URL}")
     if(_match)
         set(SUNSHINE_REPO_OWNER "${CMAKE_MATCH_1}")

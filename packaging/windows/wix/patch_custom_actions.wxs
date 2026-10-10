@@ -24,11 +24,12 @@
       <RegistrySearch Id="Search_ViGEmBus_Service64" Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\ViGEmBus" Name="DisplayName" Type="raw" Win64="yes"/>
       <RegistrySearch Id="Search_ViGEmBus_Service32" Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\ViGEmBus" Name="DisplayName" Type="raw"/>
     </Property>
-    <Feature Id="VibepolloExtras" Title="Vibepollo Components" Level="1" Absent="disallow">
+    <Feature Id="VibepolloExtras" Title="Umbra (Vibepollo) Components" Level="1" Absent="disallow">
       <ComponentRef Id="CtlStopApolloLegacy"/>
       <ComponentRef Id="ApolloSvc"/>
       <ComponentRef Id="RemoveLegacyApolloUninstallKey"/>
       <ComponentRef Id="Fw_Exceptions"/>
+      <ComponentRef Id="Fw_UmbraLink"/>  <!-- Umbra -->
       <ComponentRef Id="StartMenuShortcut"/>
       <ComponentRef Id="SudoVdaRegistryDefaults"/>
       <ComponentRef Id="ArpCustomUninstallEntry"/>

@@ -25,6 +25,9 @@
 // local includes
 #include "crypto.h"
 #include "thread_safe.h"
+#ifdef APOLLO_BETA_PROFILE
+#include "beta_profile.h"
+#endif
 
 #ifdef _WIN32
   #include <winsock2.h>
@@ -56,6 +59,9 @@ namespace rtsp_stream {
     // no target was verified and must never fall back to a physical display.
     std::optional<std::string> remote_capture_output;
     std::string rtsp_source_address;
+#ifdef APOLLO_BETA_PROFILE
+    beta_profile::lease_t beta_profile;
+#endif
 
     crypto::aes_t gcm_key;
     crypto::aes_t iv;
@@ -102,6 +108,18 @@ namespace rtsp_stream {
     bool prefer_sdr_10bit = false;
     // Explicit HDR-off override. Unlike prefer_sdr_10bit, this does not request Main10.
     bool force_sdr = false;
+    bool aurora_gpu_hevc = false;
+    // Umbra: this launch is one pane of an Eclipse co-op session (umbraCoop=1), so the co-op-only
+    // encoder tuning applies to it and to nothing else (video::config_t::umbra_coop).
+    bool umbra_coop = false;
+    // Umbra: the client asked for the host's physical monitor(s) off while it streams (umbraMonitorOff=1,
+    // host_monitor.h). Implies the virtual display.
+    bool host_monitor_off = false;
+    // Umbra wired pin (wired_pin.h): the launch's source address and the client's own cards.
+    std::string client_address;
+    std::string wired_mac;
+    std::vector<std::string> own_macs;
+    std::vector<std::string> own_ips;
     bool enable_sops;
     // Moonlight's VRR request passed its launch-time VSync, display-refresh,
     // and adaptive-headroom checks. The renderer may still fall back later.

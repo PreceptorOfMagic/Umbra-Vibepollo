@@ -1,8 +1,8 @@
 {
   "id": "/v2/stream",
-  "name": "Vibepollo Browser Stream",
-  "short_name": "Vibepollo",
-  "description": "Low-latency remote streaming from Vibepollo",
+  "name": "Umbra (Vibepollo) Browser Stream",
+  "short_name": "Umbra",
+  "description": "Low-latency remote streaming from Umbra (Vibepollo)",
   "start_url": "/v2/stream",
   "scope": "/v2/",
   "display": "fullscreen",

@@ -1,22 +1,42 @@
 # common packaging
 
 # common cpack options
-# Branding: show Vibepollo by Nonary in installer UI
-set(CPACK_PACKAGE_NAME "Vibepollo")
-set(CPACK_PACKAGE_VENDOR "Nonary")
+# Branding: Umbra (Vibepollo) -- Umbra's co-op host built on Vibepollo (Nonary), which is built on Apollo.
+set(CPACK_PACKAGE_NAME "Umbra (Vibepollo)")
+set(CPACK_PACKAGE_VENDOR ${SUNSHINE_PUBLISHER_NAME})
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION_NUMERIC})
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 set(CPACK_PACKAGE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cpack_artifacts)
-set(CPACK_PACKAGE_CONTACT "https://github.com/Nonary/Vibepollo/issues")
+set(CPACK_PACKAGE_CONTACT ${SUNSHINE_PUBLISHER_ISSUE_URL})
 set(CPACK_PACKAGE_DESCRIPTION ${CMAKE_PROJECT_DESCRIPTION})
 set(CPACK_PACKAGE_HOMEPAGE_URL ${CMAKE_PROJECT_HOMEPAGE_URL})
 set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/LICENSE)
 set(CPACK_PACKAGE_ICON ${PROJECT_SOURCE_DIR}/sunshine.png)
-# Ensure the generated installer filename uses the branded name
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}")
-set(CPACK_STRIP_FILES YES)
+# Umbra: the file name stays Vibepollo's -- the Windows bootstrapper embeds and extracts "Vibepollo.msi" by
+# that name. Release assets are renamed at upload (Umbra-Vibepollo-windows-x64.exe).
+set(CPACK_PACKAGE_FILE_NAME "Vibepollo")
+# A signed build strips its binaries BEFORE they are signed, because stripping afterwards removes
+# the signature, and then packs them untouched (.github/workflows/release-windows-signed.yml).
+option(UMBRA_PACKAGE_PRESTRIPPED "Binaries are already stripped and signed; CPack must not strip them" OFF)
+if(NOT UMBRA_PACKAGE_PRESTRIPPED)
+    set(CPACK_STRIP_FILES YES)
+endif()
+
+# Umbra: install the release notices with the required application component so every
+# package carries the same legal and source-delivery material.
+install(FILES
+        "${PROJECT_SOURCE_DIR}/LICENSE"
+        "${PROJECT_SOURCE_DIR}/NOTICE"
+        "${PROJECT_SOURCE_DIR}/THIRD-PARTY-NOTICES.md"
+        "${PROJECT_SOURCE_DIR}/SOURCE-MANIFEST.template.md"
+        "${PROJECT_SOURCE_DIR}/SOURCE-MANIFEST.md"
+        DESTINATION "."
+        COMPONENT application)
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/packaging/licenses/"
+        DESTINATION "licenses"
+        COMPONENT application)
 
 # install common assets
 install(DIRECTORY "${SUNSHINE_SOURCE_ASSETS_DIR}/common/assets/"

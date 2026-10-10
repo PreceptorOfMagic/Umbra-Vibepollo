@@ -33,7 +33,7 @@ async function check(forced = false): Promise<void> {
       failed.value = false;
       return;
     }
-    const response = await fetch('https://api.github.com/repos/Nonary/Vibepollo/releases', {
+    const response = await fetch('https://api.github.com/repos/PreceptorOfMagic/Umbra-Vibepollo/releases', {  // Umbra: this edition's releases
       headers: { Accept: 'application/json' },
       credentials: 'omit',
       signal: controller.signal,
@@ -79,9 +79,9 @@ onBeforeUnmount(() => {
     >
       <a
         :href="
-          available.url?.startsWith('https://github.com/Nonary/Vibepollo/releases/')
+          available.url?.startsWith('https://github.com/PreceptorOfMagic/Umbra-Vibepollo/releases/')
             ? available.url
-            : 'https://github.com/Nonary/Vibepollo/releases'
+            : 'https://github.com/PreceptorOfMagic/Umbra-Vibepollo/releases'
         "
         target="_blank"
         rel="noopener noreferrer"

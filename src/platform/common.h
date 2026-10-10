@@ -478,6 +478,10 @@ namespace platf {
     };
   };
 
+  struct gpu_hevc_encode_device_t: encode_device_t {
+    virtual bool encode(uint64_t frame_index, bool force_idr, std::vector<uint8_t>& bytes, bool& idr) = 0;
+  };
+
   struct nvenc_encode_device_t: encode_device_t {
     virtual bool init_encoder(const video::config_t &client_config, const video::sunshine_colorspace_t &colorspace) = 0;
 
@@ -625,6 +629,10 @@ namespace platf {
     }
 
     virtual std::unique_ptr<amf_encode_device_t> make_amf_encode_device(pix_fmt_e pix_fmt) {
+      return nullptr;
+    }
+
+    virtual std::unique_ptr<gpu_hevc_encode_device_t> make_gpu_hevc_encode_device(const video::config_t&) {
       return nullptr;
     }
 
@@ -1015,7 +1023,7 @@ namespace platf {
    */
   platform_caps::caps_t get_capabilities();
 
-  inline constexpr std::string_view SERVICE_NAME = "Apollo";
+  inline constexpr std::string_view SERVICE_NAME = "Umbra";  // Umbra: name
   inline constexpr std::string_view SERVICE_TYPE = "_nvstream._tcp";
 
   namespace publish {

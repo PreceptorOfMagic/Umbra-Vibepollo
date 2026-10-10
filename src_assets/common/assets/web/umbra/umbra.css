@@ -1,0 +1,69 @@
+/* Umbra (Vibepollo) colours, imported by main.ts after Vibepollo's own styles.
+ *
+ * Only Vibepollo's design tokens are overridden (styles/tokens.css, generated from design/tokens.json),
+ * so Vibepollo's pages and markup stay exactly as Vibepollo ships them. Status colours keep their
+ * meanings; the accent, primary buttons and focus ring take the Umbra violet.
+ *
+ * Palette: the Eclipse/Umbra Project Hub (site/assets/styles.css): page #08070b, surface #100e16,
+ * raised #17131f, soft #21182e, ink #fbf9ff, muted #c0b8ca, accent #a78bfa / #d8b4fe / #6d28d9.
+ * After a Vibepollo merge, LOOK at the pages: a token rename upstream merges cleanly and can still leave
+ * these overrides pointing at nothing. */
+
+/* Dark is Vibepollo's default (index.html sets data-theme="dark"); never let these beat its light theme. */
+:root:not([data-theme='light']),
+[data-theme='dark'] {
+  --vs-color-accent-default: #a78bfa;
+  --vs-color-accent-hover: #d8b4fe;
+  --vs-button-primary-bg: #a78bfa;
+  --vs-button-primary-bg-hover: #d8b4fe;
+  --vs-button-primary-fg: #08070b;
+  --vs-color-text-on-accent: #08070b;
+  --vs-color-data-accent: #d8b4fe;
+  --vs-color-bg-canvas: #08070b;
+  --vs-color-bg-surface: #100e16;
+  --vs-color-bg-raised: #21182e;
+  --vs-color-bg-subtle: #17131f;
+  --vs-color-text-primary: #fbf9ff;
+  --vs-color-text-secondary: #d6cfe0;
+  --vs-color-text-muted: #c0b8ca;
+}
+
+[data-theme='light'] {
+  --vs-color-accent-default: #6d28d9;
+  --vs-color-accent-hover: #5b21b6;
+  --vs-button-primary-bg: #6d28d9;
+  --vs-button-primary-bg-hover: #5b21b6;
+  --vs-button-primary-fg: #ffffff;
+  --vs-color-text-on-accent: #ffffff;
+  --vs-color-data-accent: #6d28d9;
+}
+
+.umbra-card {
+  margin-block: 24px;
+}
+
+.umbra-card h3 {
+  margin-block: 20px 8px;
+  font-size: 1rem;
+}
+
+.umbra-card p {
+  margin-block: 0 8px;
+}
+
+.umbra-card__muted {
+  color: var(--vs-color-text-muted);
+}
+
+.umbra-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.umbra-card__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--vs-color-accent-default);
+}
