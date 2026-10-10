@@ -2940,6 +2940,42 @@ namespace proc {
     return 0;
   }
 
+#ifdef _WIN32
+  /**
+   * Umbra: set a (virtual) display's mode, refresh in millihertz. Apollo's VDISPLAY::changeDisplaySettings did
+   * this; Vibepollo still declares it (virtual_display_legacy.h) but no longer compiles its definition. Tries the
+   * rounded refresh, then the neighbouring integer rate.
+   */
+  static LONG umbra_set_display_mode(const wchar_t *device_name, int width, int height, int refresh_millihz) {
+    DEVMODEW mode {};
+    mode.dmSize = sizeof(mode);
+    if (!EnumDisplaySettingsW(device_name, ENUM_CURRENT_SETTINGS, &mode)) {
+      return DISP_CHANGE_FAILED;
+    }
+    DWORD rate = refresh_millihz / 1000;
+    DWORD alt_rate = rate;
+    if (refresh_millihz % 1000) {
+      if (refresh_millihz % 1000 >= 900) {
+        rate += 1;
+      } else {
+        alt_rate += 1;
+      }
+    } else {
+      alt_rate -= 1;
+    }
+    mode.dmPelsWidth = width;
+    mode.dmPelsHeight = height;
+    mode.dmDisplayFrequency = rate;
+    mode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
+    auto result = ChangeDisplaySettingsExW(device_name, &mode, nullptr, CDS_UPDATEREGISTRY, nullptr);
+    if (result != DISP_CHANGE_SUCCESSFUL) {
+      mode.dmDisplayFrequency = alt_rate;
+      result = ChangeDisplaySettingsExW(device_name, &mode, nullptr, CDS_UPDATEREGISTRY, nullptr);
+    }
+    return result;
+  }
+#endif
+
   bool proc_t::prepare_gpu_hevc_resume(const rtsp_stream::launch_session_t& session) {
     // Umbra: EVERY co-op pane (umbraCoop), not only the GPU HEVC one -- the built-in pane is
     // resumable, and a co-op resumed in the other orientation, at another size or from another
@@ -2967,7 +3003,7 @@ namespace proc {
     if (mode.dmPelsWidth != unsigned(session.width) || mode.dmPelsHeight != unsigned(vd_height)) {
       int fps = session.fps < 1000 ? session.fps * 1000 : session.fps;
       if (config::video.double_refreshrate) fps *= 2;
-      auto result = VDISPLAY::legacy::changeDisplaySettings(name.c_str(), session.width, vd_height, fps);
+      auto result = umbra_set_display_mode(name.c_str(), session.width, vd_height, fps);
       if (result != ERROR_SUCCESS && _launch_session) {
         // SudoVDA can retain only the custom mode supplied when its monitor was
         // created. Recreate this paused virtual monitor with its SAME identity;
@@ -2987,7 +3023,7 @@ namespace proc {
         name = *created->display_name;
         display_name = platf::to_utf8(name);
         config::video.output_name = display_name;
-        result = VDISPLAY::legacy::changeDisplaySettings(name.c_str(), session.width, vd_height, fps);
+        result = umbra_set_display_mode(name.c_str(), session.width, vd_height, fps);
         display_helper_integration::reset_persistence();
       }
       mode = {}; mode.dmSize = sizeof(mode);
