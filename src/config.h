@@ -160,9 +160,6 @@ namespace config {
       std::optional<int> amd_quality_av1;  // nullopt = follow usage-preset default
       std::optional<int> amd_preanalysis;
       std::optional<int> amd_vbaq;  // nullopt = follow usage-preset default
-      // ROLLING INTRA REFRESH for the AMF encoder. Unset = never passed to ffmpeg, so an
-      // absent config key leaves encoding byte-identical to stock.
-      std::optional<int> amd_intra_refresh_mb;
       int amd_coder;
       // Native AMF encoder (amdvce_experimental) tuning knobs.
       int amd_ltr_frames;  // Long-term reference frames for RFI (0 = off)
@@ -175,6 +172,9 @@ namespace config {
       std::optional<int> amd_high_motion_quality_boost;  // High-motion quality boost: 1=on, 0=off
       std::optional<int> amd_av1_screen_content;  // AV1 screen-content tools: 1=on, 0=off
       std::optional<int> amd_av1_latency_mode;  // AV1 encoding-latency mode (0-3)
+      // Umbra: ROLLING INTRA REFRESH for the AMF encoder. Unset = never passed to ffmpeg, so an absent config key
+      // leaves encoding byte-identical to stock. LAST on purpose: config.cpp initialises this struct by position.
+      std::optional<int> amd_intra_refresh_mb;
     } amd;
 
     struct {

@@ -2473,9 +2473,9 @@ namespace proc {
     }
 
     // Umbra: a client that asked for its wired card gets it pinned for the session (reverted in terminate).
-    if (launch_session) {
-      wired_pin::apply(launch_session->client_address, launch_session->wired_mac,
-                       launch_session->own_macs, launch_session->own_ips);
+    if (_launch_session) {
+      wired_pin::apply(_launch_session->client_address, _launch_session->wired_mac,
+                       _launch_session->own_macs, _launch_session->own_ips);
     }
 
     _env["APOLLO_APP_STATUS"] = "RUNNING";
@@ -2967,7 +2967,7 @@ namespace proc {
     if (mode.dmPelsWidth != unsigned(session.width) || mode.dmPelsHeight != unsigned(vd_height)) {
       int fps = session.fps < 1000 ? session.fps * 1000 : session.fps;
       if (config::video.double_refreshrate) fps *= 2;
-      auto result = VDISPLAY::changeDisplaySettings(name.c_str(), session.width, vd_height, fps);
+      auto result = VDISPLAY::legacy::changeDisplaySettings(name.c_str(), session.width, vd_height, fps);
       if (result != ERROR_SUCCESS && _launch_session) {
         // SudoVDA can retain only the custom mode supplied when its monitor was
         // created. Recreate this paused virtual monitor with its SAME identity;
@@ -2987,7 +2987,7 @@ namespace proc {
         name = *created->display_name;
         display_name = platf::to_utf8(name);
         config::video.output_name = display_name;
-        result = VDISPLAY::changeDisplaySettings(name.c_str(), session.width, vd_height, fps);
+        result = VDISPLAY::legacy::changeDisplaySettings(name.c_str(), session.width, vd_height, fps);
         display_helper_integration::reset_persistence();
       }
       mode = {}; mode.dmSize = sizeof(mode);
