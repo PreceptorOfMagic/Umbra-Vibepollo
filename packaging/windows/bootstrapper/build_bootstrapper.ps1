@@ -267,10 +267,10 @@ if ([string]::IsNullOrWhiteSpace($informationalVersion)) {
 }
 if ($UninstallOnly) {
     $assemblyInfoPath = Join-Path $artifactDir "VibepolloUninstall.AssemblyInfo.cs"
-    $assemblyTitle = "Vibepollo Uninstaller"
+    $assemblyTitle = "Umbra (Vibepollo) Uninstaller"
 } else {
     $assemblyInfoPath = Join-Path $artifactDir "VibepolloInstaller.AssemblyInfo.cs"
-    $assemblyTitle = "Vibepollo Installer"
+    $assemblyTitle = "Umbra (Vibepollo) Installer"
 }
 $assemblyInfoContent = @(
     "using System.Reflection;",

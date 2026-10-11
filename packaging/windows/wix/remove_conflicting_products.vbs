@@ -56,6 +56,7 @@ Private Function IsTargetProduct(displayName)
     nameUpper = UCase(Trim(displayName))
     IsTargetProduct = (nameUpper = "SUNSHINE") _
         Or (nameUpper = "APOLLO") _
+        Or (nameUpper = "UMBRA") _
         Or (Left(nameUpper, 9) = "VIBESHINE")
 End Function
 
