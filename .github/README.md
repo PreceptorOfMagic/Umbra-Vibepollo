@@ -4,8 +4,13 @@
 
 [Project Hub](https://github.com/PreceptorOfMagic/Eclipse-Umbra-Project-Hub) · [Eclipse](https://github.com/PreceptorOfMagic/Eclipse) · [Umbra (Apollo-based)](https://github.com/PreceptorOfMagic/Umbra) · [Vibepollo](https://github.com/Nonary/Vibepollo)
 
-> **Status: experimental, no release yet.** This edition compiles and its web interface builds, but it has not
-> been installed or streamed from yet. For a tested host, use [Umbra](https://github.com/PreceptorOfMagic/Umbra).
+> **Status: first release, 2.0.0-umbra.1.** Installed and checked on the project's three test PCs (Windows 11;
+> RTX 4070, RTX 3070, Radeon RX Vega): installs over Umbra in place and keeps pairings, and every Umbra component
+> is present. Live streaming and co-op testing of this version is still in progress; the Apollo-based
+> [Umbra](https://github.com/PreceptorOfMagic/Umbra) is the tested version.
+
+[Download the latest release](https://github.com/PreceptorOfMagic/Umbra-Vibepollo/releases/latest) — the Windows
+x64 installer `.exe` under **Assets**.
 
 ## Which Umbra?
 
