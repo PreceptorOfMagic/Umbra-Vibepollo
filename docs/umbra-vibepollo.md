@@ -83,7 +83,12 @@ Re-applied onto Vibepollo's restructured files (git could not align them): `nvht
 (GPU HEVC session, co-op GOP, AMF intra refresh, loop filter, 2-frame VBV), `process.cpp` (co-op pad inset, Co-op
 Pane, global commands for built-in apps).
 
-## Open risks (UNTESTED -- each needs a live test before release)
+## Risks recorded before the first release
+
+2026-10-11: 2.0.0-umbra.1 was installed on all three test PCs and tested live by the maintainer from the TV; the issues
+found then (Quit vs Remote Monitor, legacy web UI and tray branding, unsigned VHF gamepad driver) were fixed in the
+release and no further issues were found. The list below is what was identified from the code before that testing;
+keep it as the checklist for the next Vibepollo merge.
 
 - **Mixed-vendor co-op splice.** Vibepollo has its own NVENC changes (split-frame encoding, SDK 13 paths) and a
   native AMF encoder (`amdvce_experimental`, opt-in). The default AMD path is still FFmpeg AMF, renamed

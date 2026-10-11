@@ -4,10 +4,9 @@
 
 [Project Hub](https://github.com/PreceptorOfMagic/Eclipse-Umbra-Project-Hub) · [Eclipse](https://github.com/PreceptorOfMagic/Eclipse) · [Umbra (Apollo-based)](https://github.com/PreceptorOfMagic/Umbra) · [Vibepollo](https://github.com/Nonary/Vibepollo)
 
-> **Status: first release, 2.0.0-umbra.1.** Installed and checked on the project's three test PCs (Windows 11;
-> RTX 4070, RTX 3070, Radeon RX Vega): installs over Umbra in place and keeps pairings, and every Umbra component
-> is present. Live streaming and co-op testing of this version is still in progress; the Apollo-based
-> [Umbra](https://github.com/PreceptorOfMagic/Umbra) is the tested version.
+> **Status: 2.0.0-umbra.1, released and tested.** Installed on the project's three test PCs (Windows 11;
+> RTX 4070, RTX 3070, Radeon RX Vega) over the Apollo-based Umbra, keeping configuration and pairings, and tested
+> live by the maintainer streaming to Eclipse; no further issues were found.
 
 [Download the latest release](https://github.com/PreceptorOfMagic/Umbra-Vibepollo/releases/latest) — the Windows
 x64 installer `.exe` under **Assets**.
