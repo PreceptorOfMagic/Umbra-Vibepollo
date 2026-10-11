@@ -14,7 +14,7 @@ x64 installer `.exe` under **Assets**.
 
 ## Which Umbra?
 
-There are two editions of Umbra. Both carry the same additions for Eclipse; they differ in the host they are built on.
+Umbra comes in two versions. Both carry the same additions for Eclipse; they differ in the host they are built on.
 
 | | Umbra | Umbra (Vibepollo) |
 |---|---|---|
