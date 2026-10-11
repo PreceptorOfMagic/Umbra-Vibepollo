@@ -50,6 +50,37 @@ src_assets/windows/misc/service/install-service.bat
 # update checks follow Umbra (Vibepollo)'s releases, not Vibepollo's (the tray toast and the web notice)
 cmake/prep/build_version.cmake
 
+# --- identity: legacy (Apollo-era) web UI -- text layer, colours, links, artwork (the tray reads its apollo*.ico)
+src_assets/common/assets/web-legacy/locale.ts
+src_assets/common/assets/web-legacy/main.ts
+src_assets/common/assets/web-legacy/template_header.html
+src_assets/common/assets/web-legacy/ResourceCard.vue
+src_assets/common/assets/web-legacy/views/DashboardView.vue
+src_assets/common/assets/web-legacy/services/changelog.ts
+src_assets/common/assets/web-legacy/public/images/apollo-locked-16.png
+src_assets/common/assets/web-legacy/public/images/apollo-locked-45.png
+src_assets/common/assets/web-legacy/public/images/apollo-locked.ico
+src_assets/common/assets/web-legacy/public/images/apollo-locked.png
+src_assets/common/assets/web-legacy/public/images/apollo-locked.svg
+src_assets/common/assets/web-legacy/public/images/apollo-pausing-16.png
+src_assets/common/assets/web-legacy/public/images/apollo-pausing-45.png
+src_assets/common/assets/web-legacy/public/images/apollo-pausing.ico
+src_assets/common/assets/web-legacy/public/images/apollo-pausing.png
+src_assets/common/assets/web-legacy/public/images/apollo-pausing.svg
+src_assets/common/assets/web-legacy/public/images/apollo-playing-16.png
+src_assets/common/assets/web-legacy/public/images/apollo-playing-45.png
+src_assets/common/assets/web-legacy/public/images/apollo-playing.ico
+src_assets/common/assets/web-legacy/public/images/apollo-playing.png
+src_assets/common/assets/web-legacy/public/images/apollo-playing.svg
+src_assets/common/assets/web-legacy/public/images/apollo.ico
+src_assets/common/assets/web-legacy/public/images/logo-apollo-16.png
+src_assets/common/assets/web-legacy/public/images/logo-apollo-45.png
+src_assets/common/assets/web-legacy/public/images/logo-apollo.svg
+# installer wizard text, product recognition, Quick Tips notes
+packaging/windows/bootstrapper/VibeshineInstaller.cs
+packaging/windows/bootstrapper/build_bootstrapper.ps1
+packaging/windows/wix/remove_conflicting_products.vbs
+
 # --- identity: web UI hooks (the rest lives in src_assets/common/assets/web/umbra/)
 src_assets/common/assets/web/i18n.ts
 src_assets/common/assets/web/main.ts
@@ -87,5 +118,7 @@ src/video.h
 cmake/compile_definitions/common.cmake
 # Eclipse Link (aurora-link.exe)
 tools/CMakeLists.txt
+# VHF gamepad driver: accept + trust Umbra's pinned pre-SignPath signer (scripts/umbra_sign_vhf.ps1)
+src_assets/windows/drivers/vhf-gamepad/install.ps1
 # nefconc built from audited source (Umbra's copy) instead of Vibepollo's downloaded binary
 src_assets/windows/drivers/sudovda/nefconc.exe

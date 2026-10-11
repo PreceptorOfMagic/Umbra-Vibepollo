@@ -33,6 +33,11 @@ $expectedProducerSourceRevision = '4b56fb9da177f320fb2d7ddb1b6262e5d55d2750'
 $expectedDriverVer = '09/22/2026,0.1.0.39'
 $expectedProtocolVersion = 2
 $expectedSignPathFoundationSignerSubject = 'CN=SignPath Foundation, O=SignPath Foundation, L=Lewes, S=Delaware, C=US'
+# Umbra (Vibepollo): until the project signs through SignPath, its build signs these two files with Umbra's own
+# certificate (scripts/umbra_sign_vhf.ps1). Accepted ONLY by this exact thumbprint, and then trusted on the machine
+# (LocalMachine Root + TrustedPublisher) the way SudoVDA's and the display driver package's certificates are.
+$umbraLocalSignerSubject = 'CN=Umbra (Vibepollo) Driver Signing (pre-SignPath)'
+$umbraLocalSignerThumbprint = '53DCB6EECA685704AFA2E26E7ECE5EBC266C56F6'
 
 # Signing channel for a package that ships unsigned and is signed by the
 # consumer MSI signing request instead. SignPath is not available on
@@ -135,6 +140,28 @@ function Get-ValidatedSharedPublisherCertificate {
         throw '[VibeshineVhfGamepad] Catalog and root-device setup tool were signed by different certificates.'
     }
     return $CatalogSignature.SignerCertificate
+}
+
+function Ensure-UmbraLocalSignerTrusted {
+    param([Parameter(Mandatory = $true)] $Certificate)
+
+    if ((Get-Thumbprint -Certificate $Certificate) -ne $umbraLocalSignerThumbprint -or
+        -not [string]::Equals([string] $Certificate.Subject, $umbraLocalSignerSubject, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw '[VibeshineVhfGamepad] Refusing to trust a certificate that is not the pinned Umbra signer.'
+    }
+    foreach ($storeName in @('Root', 'TrustedPublisher')) {
+        $store = [System.Security.Cryptography.X509Certificates.X509Store]::new($storeName, 'LocalMachine')
+        $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+        try {
+            $found = $store.Certificates.Find([System.Security.Cryptography.X509Certificates.X509FindType]::FindByThumbprint, $umbraLocalSignerThumbprint, $false)
+            if ($found.Count -eq 0) {
+                $store.Add($Certificate)
+                Write-DriverMessage "Trusted the pinned Umbra driver signer in LocalMachine\$storeName."
+            }
+        } finally {
+            $store.Close()
+        }
+    }
 }
 
 function Ensure-ProductionPublisherTrusted {
@@ -411,11 +438,20 @@ function Assert-DriverPackage {
         throw '[VibeshineVhfGamepad] Catalog or root-device setup tool has no intact Authenticode signature.'
     }
     $productionPublisherCertificate = $null
+    $productionPublisherSubject = $expectedSignPathFoundationSignerSubject
     if (-not $signedDownstream) {
         if ((Get-Thumbprint -Certificate $catalogSignature.SignerCertificate) -ne $manifest.signing.signer_thumbprint.ToUpperInvariant() -or
             (Get-Thumbprint -Certificate $toolSignature.SignerCertificate) -ne $manifest.signing.device_setup_signer_thumbprint.ToUpperInvariant()) {
             throw '[VibeshineVhfGamepad] Manifest signer identity does not match the signed package artifacts.'
         }
+    } elseif ((Get-Thumbprint -Certificate $catalogSignature.SignerCertificate) -eq $umbraLocalSignerThumbprint -and
+              (Get-Thumbprint -Certificate $toolSignature.SignerCertificate) -eq $umbraLocalSignerThumbprint) {
+        # Umbra: the pre-SignPath signer (see $umbraLocalSignerThumbprint). Trust it, then re-read the signatures.
+        Ensure-UmbraLocalSignerTrusted -Certificate $catalogSignature.SignerCertificate
+        $catalogSignature = Get-AuthenticodeSignature -LiteralPath $catalogPath
+        $toolSignature = Get-AuthenticodeSignature -LiteralPath $toolPath
+        $productionPublisherCertificate = $catalogSignature.SignerCertificate
+        $productionPublisherSubject = $umbraLocalSignerSubject
     } else {
         # The signed MSI authenticates these two package files. Bind silent PnP
         # trust to the exact shared SignPath Foundation signer certificate,
@@ -444,6 +480,7 @@ function Assert-DriverPackage {
         InfPath = Join-Path $Root 'driver/VibeshineVhfGamepad.inf'
         SetupToolPath = $toolPath
         ProductionPublisherCertificate = $productionPublisherCertificate
+        ProductionPublisherSubject = $productionPublisherSubject
     }
 }
 
@@ -506,7 +543,7 @@ function Install-DriverPackage {
     if ($null -ne $package.ProductionPublisherCertificate) {
         Ensure-ProductionPublisherTrusted `
             -PublisherCertificate $package.ProductionPublisherCertificate `
-            -ExpectedSubject $expectedSignPathFoundationSignerSubject
+            -ExpectedSubject $package.ProductionPublisherSubject
     }
     # PnPUtil performs Windows' catalog-to-INF/DLL membership validation while
     # it stages the package. The installed product deliberately does not ship

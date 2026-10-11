@@ -15,6 +15,11 @@
 type Messages = Record<string, unknown>;
 
 const UMBRA_EN = {
+  // The legacy (Apollo-era) web UI's resource card (web-legacy/ResourceCard.vue).
+  resource_card: {
+    resources_desc:
+      "Discord is Moonlight's community and GitHub Discussions is Vibepollo's. Report problems with this host in Umbra (Vibepollo)'s GitHub Issues.",
+  },
   umbra: {
     title: 'Umbra (Vibepollo)',
     version: 'Version {version}',

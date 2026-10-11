@@ -1800,7 +1800,7 @@ namespace VibepolloInstaller {
     private async Task ShowInstallFailureSupportDialogAsync(string failureDetail, InstallerResult installResult) {
       var decision = await ShowOverlayAsync(
         "Install failed",
-        failureDetail + "\n\nSave logs now, then report this issue on GitHub or Discord.",
+        failureDetail + "\n\nSave logs now, then report this issue on GitHub.",
         "Save logs",
         "Not now",
         new SolidColorBrush(Color.FromRgb(99, 102, 241)),
@@ -1822,7 +1822,7 @@ namespace VibepolloInstaller {
       var warningDetail = BuildComponentFailureDetail(installResult == null ? null : installResult.ComponentFailures);
       var decision = await ShowOverlayAsync(
         "Install completed with warnings",
-        warningDetail + "\n\nSave logs now, then report this issue on GitHub or Discord.",
+        warningDetail + "\n\nSave logs now, then report this issue on GitHub.",
         "Save logs",
         "Not now",
         new SolidColorBrush(Color.FromRgb(99, 102, 241)),
@@ -1871,8 +1871,7 @@ namespace VibepolloInstaller {
         return;
       }
 
-      var nextStep = "Attach this file on GitHub: https://github.com/PreceptorOfMagic/Umbra-Umbra (Vibepollo)/issues\n"
-        + "Or Discord (#vibeshine): https://discord.com/invite/CGg5JxN";
+      var nextStep = "Attach this file on GitHub: https://github.com/PreceptorOfMagic/Umbra-Vibepollo/issues";
       SetStatus("Support logs saved.", outputPath, _statusSuccessBrush);
       await ShowOverlayInfoAsync(
         "Logs saved",
@@ -1910,8 +1909,7 @@ namespace VibepolloInstaller {
         return;
       }
 
-      var nextStep = "Attach this file on GitHub: https://github.com/PreceptorOfMagic/Umbra-Umbra (Vibepollo)/issues\n"
-        + "Or Discord (#vibeshine): https://discord.com/invite/CGg5JxN";
+      var nextStep = "Attach this file on GitHub: https://github.com/PreceptorOfMagic/Umbra-Vibepollo/issues";
       SetStatus("Support logs saved.", outputPath, _statusSuccessBrush);
       await ShowOverlayInfoAsync(
         "Logs saved",
@@ -1920,7 +1918,7 @@ namespace VibepolloInstaller {
 
     private void WriteInstallFailureSupportReport(string outputPath, string failureDetail, InstallerResult installResult) {
       var candidateLogs = CollectSupportLogFiles(installResult == null ? null : installResult.LogPath);
-      var destination = "GitHub issue or Discord #vibeshine";
+      var destination = "GitHub issue";
       var executionVersion = _bundleVersion.ToString(3);
       using (var writer = new StreamWriter(outputPath, false)) {
         writer.WriteLine(BuildSupportSummary(destination, executionVersion, failureDetail, installResult, candidateLogs.Count, "Umbra (Vibepollo) install failure report", "Failure detail:"));
@@ -1948,7 +1946,7 @@ namespace VibepolloInstaller {
 
     private void WriteInstallWarningSupportReport(string outputPath, string warningDetail, InstallerResult installResult) {
       var candidateLogs = CollectSupportLogFiles(installResult == null ? null : installResult.LogPath);
-      var destination = "GitHub issue or Discord #vibeshine";
+      var destination = "GitHub issue";
       var executionVersion = _bundleVersion.ToString(3);
       using (var writer = new StreamWriter(outputPath, false)) {
         writer.WriteLine(BuildSupportSummary(destination, executionVersion, warningDetail, installResult, candidateLogs.Count, "Umbra (Vibepollo) install warning report", "Warning detail:"));
@@ -2068,8 +2066,7 @@ namespace VibepolloInstaller {
         detail ?? "Unknown error",
         string.Empty,
         "Next step:",
-        "Attach this file on GitHub: https://github.com/PreceptorOfMagic/Umbra-Umbra (Vibepollo)/issues",
-        "Or Discord (#vibeshine): https://discord.com/invite/CGg5JxN"
+        "Attach this file on GitHub: https://github.com/PreceptorOfMagic/Umbra-Vibepollo/issues"
       };
       return string.Join(Environment.NewLine, lines);
     }
@@ -2084,17 +2081,11 @@ namespace VibepolloInstaller {
 
       block.Inlines.Add(new Run("Open an issue on "));
       var githubLink = new Hyperlink(new Run("GitHub")) {
-        NavigateUri = new Uri("https://github.com/PreceptorOfMagic/Umbra-Umbra (Vibepollo)/issues")
+        NavigateUri = new Uri("https://github.com/PreceptorOfMagic/Umbra-Vibepollo/issues")
       };
-      githubLink.Click += (sender, args) => OpenExternalUrl("https://github.com/PreceptorOfMagic/Umbra-Umbra (Vibepollo)/issues");
+      githubLink.Click += (sender, args) => OpenExternalUrl("https://github.com/PreceptorOfMagic/Umbra-Vibepollo/issues");
       block.Inlines.Add(githubLink);
-      block.Inlines.Add(new Run(" or join "));
-      var discordLink = new Hyperlink(new Run("Discord (#vibeshine)")) {
-        NavigateUri = new Uri("https://discord.com/invite/CGg5JxN")
-      };
-      discordLink.Click += (sender, args) => OpenExternalUrl("https://discord.com/invite/CGg5JxN");
-      block.Inlines.Add(discordLink);
-      block.Inlines.Add(new Run("."));
+      block.Inlines.Add(new Run("."));  // Umbra: no Discord of its own; Vibepollo's community is not where Umbra problems go
 
       return block;
     }

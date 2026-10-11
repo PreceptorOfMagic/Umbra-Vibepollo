@@ -155,7 +155,7 @@
                     strong
                     size="small"
                     class="w-full justify-center sm:w-auto"
-                    href="https://github.com/Nonary/Vibepollo/issues/new?template=bug_report.yml"
+                    href="https://github.com/PreceptorOfMagic/Umbra-Vibepollo/issues/new"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -699,7 +699,7 @@ async function runVersionChecks() {
     // Remote release checks (GitHub)
     try {
       githubRelease.value = await fetch(
-        'https://api.github.com/repos/Nonary/Vibepollo/releases/latest',
+        'https://api.github.com/repos/PreceptorOfMagic/Umbra-Vibepollo/releases/latest',  // Umbra: this edition's releases
       ).then((r) => r.json());
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -707,7 +707,7 @@ async function runVersionChecks() {
     }
     // Fetch list of releases to locate prereleases and determine installed stability
     try {
-      const releases = await fetch('https://api.github.com/repos/Nonary/Vibepollo/releases').then(
+      const releases = await fetch('https://api.github.com/repos/PreceptorOfMagic/Umbra-Vibepollo/releases').then(
         (r) => r.json(),
       );
       if (Array.isArray(releases)) {

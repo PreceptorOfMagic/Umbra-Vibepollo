@@ -4,6 +4,7 @@ import { createI18n, I18n } from 'vue-i18n';
 import en from '@/public/assets/locale/en.json';
 import { http } from '@/http';
 import { toIntlLocale } from '@/utils/intlLocale';
+import { applyUmbraIdentity } from '@/umbra/identity';  // Umbra: name + own wording
 
 interface LocaleResponse {
   locale?: string;
@@ -31,6 +32,7 @@ export default async function (): Promise<any> {
   } catch (e) {
     console.error('Failed to download translations', e);
   }
+  for (const k of Object.keys(messages)) messages[k] = applyUmbraIdentity(messages[k], k);  // Umbra
   const i18n = createI18n({
     // Use the Composition API and inject global helpers so `$t` works in templates
     legacy: false,

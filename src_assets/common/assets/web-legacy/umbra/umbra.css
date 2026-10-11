@@ -1,0 +1,23 @@
+/* Umbra (Vibepollo) colours for the legacy web UI, imported by main.ts after styles/tailwind.css.
+ * Only the semantic colour variables (tailwind.config.js -> :root / .dark) are overridden; Tailwind utilities and the
+ * Naive UI theme (naive-theme.ts) both read them. `html` raises specificity above the plugin's :root / .dark.
+ * Palette: the Eclipse/Umbra Project Hub, as web/umbra/umbra.css. */
+html:root {
+  --color-primary: 109 40 217;   /* #6d28d9 */
+  --color-secondary: 124 58 237; /* #7c3aed */
+  --color-accent: 167 139 250;   /* #a78bfa */
+  --color-brand: 109 40 217;
+  --color-surface: 248 246 252;  /* #f8f6fc */
+  --color-on-primary: 255 255 255;
+  --color-on-accent: 255 255 255;
+}
+html.dark {
+  --color-primary: 167 139 250;  /* #a78bfa */
+  --color-secondary: 216 180 254;/* #d8b4fe */
+  --color-accent: 196 181 253;   /* #c4b5fd */
+  --color-brand: 167 139 250;
+  --color-dark: 8 7 11;          /* #08070b */
+  --color-surface: 16 14 22;     /* #100e16 */
+  --color-on-primary: 8 7 11;
+  --color-on-accent: 8 7 11;
+}

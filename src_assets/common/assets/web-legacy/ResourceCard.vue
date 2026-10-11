@@ -86,7 +86,7 @@ const resources = computed(() => [
     avatarStyle: 'background-color: rgba(16, 185, 129, 0.15); color: rgb(16, 185, 129);',
   },
   {
-    href: 'https://github.com/Nonary/Vibepollo/issues',
+    href: 'https://github.com/PreceptorOfMagic/Umbra-Vibepollo/issues',  // Umbra
     icon: 'fab fa-github',
     title: t('resource_card.github_issues'),
     description: t('resource_card.github_issues_desc'),
@@ -96,14 +96,14 @@ const resources = computed(() => [
 
 const legalLinks = computed(() => [
   {
-    href: 'https://github.com/Nonary/Vibepollo/blob/master/LICENSE',
+    href: 'https://github.com/PreceptorOfMagic/Umbra-Vibepollo/blob/HEAD/LICENSE',  // Umbra
     icon: 'fas fa-file-alt',
     title: t('resource_card.license'),
     description: t('resource_card.license_desc'),
     avatarStyle: 'background-color: rgba(34, 197, 94, 0.15); color: rgb(34, 197, 94);',
   },
   {
-    href: 'https://github.com/Nonary/Vibepollo/blob/master/NOTICE',
+    href: 'https://github.com/PreceptorOfMagic/Umbra-Vibepollo/blob/HEAD/THIRD-PARTY-NOTICES.md',  // Umbra
     icon: 'fas fa-exclamation',
     title: t('resource_card.third_party_notice'),
     description: t('resource_card.third_party_notice_desc'),

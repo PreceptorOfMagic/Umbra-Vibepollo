@@ -6028,6 +6028,32 @@ namespace nvhttp {
       return;
     }
 
+    // Umbra: Eclipse's Quit is /cancel. A Remote Monitor / Remote Input session this client owns runs no game, so the
+    // cancel below answered "done" and left the role held: Eclipse then listed only Resume / Disconnect Monitor and
+    // the session could not be ended from the client (2026-10-11, PC1). Quit now releases this client's remote roles
+    // exactly as the Disconnect Monitor / Disconnect Input controls do. Disconnect (no /cancel) keeps them resumable.
+    {
+      std::unique_lock remote_transition_lock {remote_http_control_transition_mutex};
+      bool released_role = false;
+      for (const auto role : {remote_session::role_e::monitor, remote_session::role_e::input}) {
+        if (const auto generation = remote_owner_generation(request_client_identity.uuid, role)) {
+          (void) rtsp_stream::disconnect_remote_role_session(request_client_identity.uuid, role, *generation, false);
+          if (role == remote_session::role_e::monitor) {
+            remote_session::release_monitor(request_client_identity.uuid, *generation, "Quit");
+          }
+          forget_remote_owner(request_client_identity.uuid, role, *generation);
+          released_role = true;
+          BOOST_LOG(info) << "Umbra: Quit released this client's Remote "sv
+                          << (role == remote_session::role_e::monitor ? "Monitor"sv : "Input"sv) << " session"sv;
+        }
+      }
+#if defined(_WIN32) || defined(__linux__)
+      if (released_role) {
+        cleanup_virtual_display_if_idle();
+      }
+#endif
+    }
+
     const bool has_running_app = proc::proc.running() > 0;
     if (!has_running_app) {
       // Natural app exit clears its owner before the client sends the final

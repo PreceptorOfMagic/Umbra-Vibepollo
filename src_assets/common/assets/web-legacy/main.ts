@@ -4,6 +4,7 @@ import { initApp } from '@/init';
 import { router } from '@/router';
 import App from '@/App.vue';
 import './styles/tailwind.css';
+import './umbra/umbra.css';  // Umbra: colours, see that file
 import { initHttpLayer } from '@/http';
 // Font Awesome core + subsets (ensure base .fa/.fas rules and fonts)
 import '@fortawesome/fontawesome-free/css/fontawesome.min.css';

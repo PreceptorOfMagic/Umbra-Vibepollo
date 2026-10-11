@@ -428,6 +428,17 @@ if(SUNSHINE_BUNDLE_VHF_GAMEPAD_DRIVER)
             VERBATIM)
     endif()
 
+    # Umbra: until SignPath signs the MSI, sign the refreshed VHF catalog + setup tool with Umbra's own certificate
+    # (scripts/umbra_sign_vhf.ps1; install.ps1 pins its thumbprint). Empty = Vibepollo's behaviour (signed later).
+    set(UMBRA_VHF_SIGNING_THUMBPRINT "" CACHE STRING "Thumbprint of Umbra's VHF driver-signing certificate (CurrentUser\\My)")
+    set(UMBRA_VHF_SIGN_COMMAND "")
+    if(UMBRA_VHF_SIGNING_THUMBPRINT)
+        set(UMBRA_VHF_SIGN_COMMAND
+            COMMAND powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass
+                    -File "${CMAKE_SOURCE_DIR}/scripts/umbra_sign_vhf.ps1"
+                    -PackageDir "${SUNSHINE_VIRTUAL_GAMEPAD_DRIVER_SOURCE_DIR}"
+                    -Thumbprint "${UMBRA_VHF_SIGNING_THUMBPRINT}")
+    endif()
     add_custom_target(refresh_sunshine_virtual_gamepad_driver_assets
         COMMAND powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass
                 -File "${SUNSHINE_VIRTUAL_GAMEPAD_DRIVER_REFRESH_SCRIPT}"
@@ -435,6 +446,7 @@ if(SUNSHINE_BUNDLE_VHF_GAMEPAD_DRIVER)
                 -PackageDir "${SUNSHINE_VIRTUAL_GAMEPAD_DRIVER_SOURCE_DIR}"
                 ${SUNSHINE_VIRTUAL_GAMEPAD_DRIVER_LOCAL_TEST_ARGS}
                 ${SUNSHINE_VIRTUAL_GAMEPAD_DRIVER_PIN_ARGS}
+        ${UMBRA_VHF_SIGN_COMMAND}
         DEPENDS "${SUNSHINE_VIRTUAL_GAMEPAD_DRIVER_REFRESH_SCRIPT}"
                 "${SUNSHINE_VIRTUAL_GAMEPAD_DRIVER_SOURCE_DIR}/install.ps1"
                 "${SUNSHINE_VIRTUAL_GAMEPAD_ROOT_CLEANUP_SCRIPT}"
