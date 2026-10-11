@@ -14,9 +14,9 @@ set(CPACK_PACKAGE_DESCRIPTION ${CMAKE_PROJECT_DESCRIPTION})
 set(CPACK_PACKAGE_HOMEPAGE_URL ${CMAKE_PROJECT_HOMEPAGE_URL})
 set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/LICENSE)
 set(CPACK_PACKAGE_ICON ${PROJECT_SOURCE_DIR}/sunshine.png)
-# Umbra: the file name stays Vibepollo's -- the Windows bootstrapper embeds and extracts "Vibepollo.msi" by
-# that name. Release assets are renamed at upload (Umbra-Vibepollo-windows-x64.exe).
-set(CPACK_PACKAGE_FILE_NAME "Vibepollo")
+# Umbra: the project name, as Vibepollo does -- cmake/targets/windows.cmake hands ${PROJECT_NAME}.msi to the
+# bootstrapper, which embeds it as a resource (its own extraction name is internal).
+set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}")
 # A signed build strips its binaries BEFORE they are signed, because stripping afterwards removes
 # the signature, and then packs them untouched (.github/workflows/release-windows-signed.yml).
 option(UMBRA_PACKAGE_PRESTRIPPED "Binaries are already stripped and signed; CPack must not strip them" OFF)

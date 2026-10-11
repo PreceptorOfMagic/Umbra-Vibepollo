@@ -52,7 +52,7 @@ fails on an unlisted change, on any edit to Vibepollo's README or translations, 
 | Update checks | The tray toast (`cmake/prep/build_version.cmake`: `SUNSHINE_REPO_OWNER/NAME`) and the web notice and release notes (`UpdateNotice.vue`, `ReleaseNotes.vue`) follow **this edition's** releases. Left on Vibepollo's, they would offer a Vibepollo release that replaces this host with one lacking co-op. |
 | Artwork | Umbra's icons under Apollo's filenames. Vibepollo still ships Apollo's images unchanged, so they came in with the merge. |
 | Windows | `project(Umbra-Vibepollo)` (file-safe: it reaches the `.rc` file and the tray tooltip). MSI: Programs-list name, publisher, Start Menu folder/shortcut, service display name and firewall rule names say Umbra (Vibepollo). |
-| Kept as Vibepollo's | Install folder (`Program Files\Apollo`), service key `ApolloService`, MSI upgrade code, AppUserModelID/FQDN, the installer file name `Vibepollo.msi` (the bootstrapper extracts it by that name), and the setup wizard's own text (118 strings in one large Vibepollo file). |
+| Kept as Vibepollo's | Install folder (`Program Files\Apollo`), service key `ApolloService`, MSI upgrade code, AppUserModelID/FQDN, cache/temp folder names, driver names. |
 
 ## Versions
 
@@ -93,9 +93,11 @@ Pane, global commands for built-in apps).
   display is created and may re-apply the full height. Only matters when `coop_pad_rows` > 0.
 - **Resumed Co-op Pane resize** (`prepare_gpu_hevc_resume`) relies on Vibepollo's paused-display lifetime.
 - **Host monitor off** forces the virtual display through Vibepollo's `client_virtual_display_override`.
-- The full release build (WebRTC, TrueHDR runtime, VHF gamepad driver, Vibepollo Display Driver package) was not
-  built. The TrueHDR runtime is NVIDIA's proprietary NGX DLL, which the project's licensing rule (every third-party
-  item fully open source) does not allow in a release; decide before packaging.
+- **TrueHDR (RTX HDR) runtime: included, handled exactly as Vibepollo does** (user decision 2026-10-11). The build
+  downloads Vibepollo's pinned `Nonary/vibeshine_truehdr_runtime` v1.0.0 (`vibeshine_truehdr.dll` sha256 17e69dc6...,
+  `nvngx_truehdr.dll` sha256 9a80575f...). `nvngx_truehdr.dll` is NVIDIA's closed RTX Video SDK runtime, governed by
+  NVIDIA's SDK licence, not the GPL (Vibepollo's docs/legal.md says the same). It is an exception to the project's
+  open-source rule, made deliberately.
 - `THIRD-PARTY-NOTICES.md` and `SOURCE-MANIFEST.md` describe Umbra's Apollo build; Vibepollo adds dependencies
   (libwebrtc, Playnite plugin, PyroWave, ...) that must be audited and listed before any release.
 - `.github/workflows/release-windows-signed.yml` is Umbra's NSIS workflow; Vibepollo's own workflows expect
