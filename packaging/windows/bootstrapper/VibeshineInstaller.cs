@@ -1456,6 +1456,13 @@ namespace VibepolloInstaller {
     }
 
     private string BuildInstallButtonLabel() {
+      // Umbra: moving from plain Vibepollo is a switch between the two, not an upgrade or a downgrade -- the version
+      // numbers of the two products do not order them (2.0.0-umbra.1 sorts below Vibepollo 2.0.0). Vibepollo's own
+      // installer does not recognise "Umbra (Vibepollo)" as its product, so switching back reads "Install Vibepollo".
+      if (_installedProduct != null &&
+          string.Equals((_installedProduct.DisplayName ?? string.Empty).Trim(), "Vibepollo", StringComparison.OrdinalIgnoreCase)) {
+        return "Switch to Umbra (Vibepollo)";
+      }
       switch (GetInstallActionKind()) {
         case InstallActionKind.Install:
           return "Install Umbra (Vibepollo)";
