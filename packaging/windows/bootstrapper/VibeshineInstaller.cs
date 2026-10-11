@@ -6411,7 +6411,7 @@ namespace VibepolloInstaller {
     }
 
     private static string BuildUpgradeSourcePreUninstallFailureMessage(string uninstallMessage) {
-      var prefix = "Failed to uninstall Umbra (Vibepollo) 1.14.8 before starting installation."
+      var prefix = "Failed to uninstall Vibepollo 1.14.8 before starting installation."
         + " This version requires uninstall/reinstall to avoid web UI files being removed during upgrade.";
       if (string.IsNullOrWhiteSpace(uninstallMessage)) {
         return prefix;
