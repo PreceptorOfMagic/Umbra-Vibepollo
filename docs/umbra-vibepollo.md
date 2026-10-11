@@ -113,3 +113,15 @@ Pane, global commands for built-in apps).
    `umbra.css` pointing at nothing.
 4. Stream once, then a co-op session (NVIDIA+AMD) -- the additions live inside Vibepollo's streaming code.
 5. Bump the version to the new base (`<tag>-umbra.1`).
+
+## Future improvements (recorded 2026-10-11, not started)
+
+- **Restore the host monitor after an interrupted stream.** When Eclipse asks for the host's monitor off
+  (`umbraMonitorOff`, `src/host_monitor.cpp`), the "off" layout is saved to Windows' display database and only
+  `sessions_stopped()` turns it back on. An upgrade (or crash) during that stream kills the host first, and nothing
+  restores the panel at the next start. Fix: remember "turned off by Umbra" and restore it at start-up, like
+  `wired_pin::revert_leftovers()`. Applies to the Apollo-based Umbra too. Until then the installer's Quick Tips say
+  to end the stream first (and Win+P to recover).
+- **Upgrade both co-op hosts together.** Upgrading one host mid co-op ends only its half; a way to update both
+  co-op PCs in one step (or to warn from Eclipse that the hosts differ) would avoid a mixed-version session.
+

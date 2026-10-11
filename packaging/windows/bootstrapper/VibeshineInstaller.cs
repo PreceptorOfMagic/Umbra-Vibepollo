@@ -578,6 +578,19 @@ namespace VibepolloInstaller {
         TextWrapping = TextWrapping.Wrap
       });
 
+      // Umbra: two cases the tip above does not cover for an Eclipse host (docs/umbra-vibepollo.md, future improvements).
+      tipsStack.Children.Add(new TextBlock {
+        Text = "Eclipse co-op: upgrading this PC during a co-op session ends only this PC's half of the picture; "
+          + "the other PC keeps streaming. Reconnect after the upgrade, or upgrade both co-op PCs before you play.\n"
+          + "Monitor switched off for the stream: if Eclipse turned this PC's monitor off, end the stream before "
+          + "upgrading. Upgrading during that stream can leave the monitor off; press Win+P and choose Extend or "
+          + "PC screen only to bring it back.",
+        FontSize = 12.5,
+        Foreground = new SolidColorBrush(Color.FromRgb(211, 220, 246)),
+        Margin = new Thickness(0, 0, 0, 10),
+        TextWrapping = TextWrapping.Wrap
+      });
+
       var sshDetails = new Expander {
         Header = "Install from SSH",
         Foreground = new SolidColorBrush(Color.FromRgb(203, 219, 241)),
