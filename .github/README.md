@@ -22,18 +22,18 @@ Umbra comes in two versions. Both carry the same additions for Eclipse; they dif
 | Installer | NSIS `.exe` | Vibepollo's MSI installer |
 | Upgrades in place | an Apollo install | a Vibepollo install |
 
-Pick the edition whose base host you would otherwise use. Everything Vibepollo adds over Apollo stays as Vibepollo ships it.
+Pick the version whose base host you would otherwise use. Everything Vibepollo adds over Apollo stays as Vibepollo ships it.
 
 ## Umbra (Vibepollo) and Vibepollo
 
 Umbra (Vibepollo) is Vibepollo with the additions Eclipse needs for co-op, and as little else changed as possible.
-Vibepollo is Nonary's project and is still maintained, so this edition follows Vibepollo's releases instead of redoing
+Vibepollo is Nonary's project and is still maintained, so this version follows Vibepollo's releases instead of redoing
 its work: the additions are kept apart from Vibepollo's own code wherever they can be, so each new Vibepollo release
 can be merged in ([how](../docs/umbra-vibepollo.md)). The web interface says which Vibepollo release it is built on,
 and whether a newer one is out.
 
 It is an independent fork. It is not affiliated with or endorsed by Nonary (Vibepollo), ClassicOldSong (Apollo),
-SudoMaker or LizardByte (Sunshine). Report problems with this edition here, not to Vibepollo.
+SudoMaker or LizardByte (Sunshine). Report problems with this version here, not to Vibepollo.
 
 ## What the Umbra additions provide
 
