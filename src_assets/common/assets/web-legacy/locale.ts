@@ -32,7 +32,7 @@ export default async function (): Promise<any> {
   } catch (e) {
     console.error('Failed to download translations', e);
   }
-  for (const k of Object.keys(messages)) messages[k] = applyUmbraIdentity(messages[k], k);  // Umbra
+  for (const [k, v] of Object.entries(messages)) messages[k] = applyUmbraIdentity(v, k);  // Umbra
   const i18n = createI18n({
     // Use the Composition API and inject global helpers so `$t` works in templates
     legacy: false,
