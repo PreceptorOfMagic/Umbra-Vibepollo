@@ -177,7 +177,7 @@ const defaultGroups = [
       rtx_hdr_contrast: 0,
       rtx_hdr_saturation: 0,
       max_bitrate: 0,
-      minimum_fps_target: 20,
+      minimum_fps_target: 0,
       fallback_mode: '1920x1080x60',
       lossless_scaling_path: '',
       lossless_scaling_legacy_auto_detect: false,

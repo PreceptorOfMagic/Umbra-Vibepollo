@@ -1083,7 +1083,7 @@ export const settingsDefaults: Record<string, unknown> = {
   av1_mode: 0,
   pyrowave: true,
   max_bitrate: 0,
-  minimum_fps_target: 20,
+  minimum_fps_target: 0,
   qp: 28,
   fec_percentage: 20,
   video_max_batch_size_kb: 64,

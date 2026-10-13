@@ -969,7 +969,10 @@ namespace config {
     },  // display_device
 
     0,  // max_bitrate
-    20,  // minimum_fps_target (0 = framerate)
+    // Umbra: 0 = derived from the stream's frame rate (video.cpp), as in standard Umbra and this repo's own
+    // docs/configuration.md. Vibepollo's fixed 20 starved Eclipse co-op: the primary paces the TV's composite
+    // and a still pane at 20 (16 measured on Windows) could not keep up with a 140 fps partner pane.
+    0,  // minimum_fps_target (0 = framerate)
     true,  // wgc_pacing_smoothing
     "1920x1080x60",  // fallback_mode
     false,  // ignore_encoder_probe_failure
