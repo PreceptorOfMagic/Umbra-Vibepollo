@@ -1041,7 +1041,7 @@ export const settingsDefaults: Record<string, unknown> = {
   vulkan_hdr_layer: true,
   dd_wa_dummy_plug_hdr10: false,
   wayland_hdr_compatibility: false,
-  dd_config_revert_on_disconnect: false,
+  dd_config_revert_on_disconnect: true,
   dd_config_revert_delay: 3000,
   dd_always_restore_from_golden: true,
   dd_paused_virtual_display_timeout_secs: 7200,

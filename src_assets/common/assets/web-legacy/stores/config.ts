@@ -150,7 +150,7 @@ const defaultGroups = [
       dd_hdr_option: 'auto',
       dd_hdr_request_override: 'auto',
       dd_config_revert_delay: 3000,
-      dd_config_revert_on_disconnect: 'disabled',
+      dd_config_revert_on_disconnect: 'enabled',
       dd_paused_virtual_display_timeout_secs: 0,
       dd_always_restore_from_golden: false,
       dd_display_helper_engine: 'auto',

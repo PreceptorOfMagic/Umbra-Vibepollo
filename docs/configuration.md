@@ -1669,11 +1669,14 @@ this option to replace the running app immediately. The default is `true`.
             This can be useful for returning to physical usage of the host machine without closing the active app.
             @warning{Some applications may not function properly when display configuration is changed while active.}
             @note{On Linux, this restores the physical desktop and releases the private display.}
+            @note{Umbra turns this on by default: otherwise a stream that is paused rather than quit (the client
+            disconnected, its app was sent to the background, the network dropped) keeps the host's own monitor off
+            until the app is closed or dd_paused_virtual_display_timeout_secs runs out (2 hours).}
         </td>
     </tr>
     <tr>
         <td>Default</td>
-        <td colspan="2">@code{}disabled@endcode</td>
+        <td colspan="2">@code{}enabled@endcode (Umbra; Vibepollo and Sunshine default to disabled)</td>
     </tr>
     <tr>
         <td>Example</td>

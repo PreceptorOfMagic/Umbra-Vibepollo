@@ -945,7 +945,7 @@ namespace config {
       video_t::dd_t::hdr_option_e::automatic,  // hdr_option
       video_t::dd_t::hdr_request_override_e::automatic,  // hdr_request_override
       3s,  // config_revert_delay
-      {},  // config_revert_on_disconnect
+      true,  // config_revert_on_disconnect (Umbra: on, so a paused stream never keeps the host's monitor off)
       7200,  // paused_virtual_display_timeout_secs (2 hours)
       true,  // always_restore_from_golden (uses session fallback until a golden snapshot exists)
       video_t::dd_t::helper_engine_e::automatic,  // display_helper_engine
