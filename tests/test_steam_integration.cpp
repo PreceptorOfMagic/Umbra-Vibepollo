@@ -70,7 +70,9 @@ namespace {
     append_string(data, value);
   }
 
-  void write_test_appinfo(const fs::path &path, std::uint32_t app_id, std::string_view name = "Example") {
+  // with_linux_entry puts a Linux-only launch entry first ("0", working
+  // directory "Linux") and moves the Windows entry to "1".
+  void write_test_appinfo(const fs::path &path, std::uint32_t app_id, std::string_view name = "Example", bool with_linux_entry = false) {
     const std::vector<std::string> keys {
       "appinfo",
       "config",
@@ -82,7 +84,8 @@ namespace {
       "type",
       "oslist",
       "common",
-      "name"
+      "name",
+      "1"
     };
     std::vector<std::uint8_t> blob;
     append_object(blob, 0);
@@ -92,7 +95,18 @@ namespace {
     blob.push_back(0x08);
     append_object(blob, 1);
     append_object(blob, 2);
-    append_object(blob, 3);
+    if (with_linux_entry) {
+      append_object(blob, 3);
+      append_value(blob, 4, "game.sh");
+      append_value(blob, 6, "Linux");
+      append_value(blob, 7, "default");
+      append_object(blob, 1);
+      append_value(blob, 8, "linux");
+      blob.insert(blob.end(), {0x08, 0x08});
+      append_object(blob, 11);
+    } else {
+      append_object(blob, 3);
+    }
     append_value(blob, 4, "Game.exe");
     append_value(blob, 5, "-from-appinfo");
     append_value(blob, 6, "bin");
@@ -172,6 +186,33 @@ TEST(SteamDiscovery, CatalogIncludesPlayedUninstalledGamesWithNames) {
   EXPECT_FALSE(games[0].installed);
   EXPECT_EQ(games[0].last_played, 1700000000U);
   EXPECT_EQ(games[0].playtime_minutes, 321U);
+  fs::remove_all(base, ec);
+}
+
+TEST(SteamDiscovery, LaunchEntryMatchesHostOperatingSystem) {
+  const auto nonce = std::chrono::steady_clock::now().time_since_epoch().count() ^ static_cast<long long>(std::random_device {}());
+  const auto base = fs::temp_directory_path() / ("vibepollo-steam-launch-os-test-" + std::to_string(nonce));
+  const auto install = base / "steamapps/common/DualGame";
+  std::error_code ec;
+  fs::create_directories(install / "bin", ec);
+  fs::create_directories(base / "appcache", ec);
+  {
+    std::ofstream output(base / "steamapps/appmanifest_42.acf");
+    output << R"VDF("AppState" { "appid" "42" "name" "Dual Game" "installdir" "DualGame" })VDF";
+  }
+  write_test_appinfo(base / "appcache/appinfo.vdf", 42, "Dual Game", true);
+
+  const auto games = discover_catalog({base});
+  ASSERT_EQ(games.size(), 1U);
+  ASSERT_EQ(games[0].app_id, 42U);
+#ifdef _WIN32
+  // Only the Windows depot can be installed here: a Linux entry's paths do not exist.
+  EXPECT_EQ(games[0].launch_os, "windows");
+  EXPECT_EQ(games[0].launch_working_dir, install / "bin");
+#else
+  EXPECT_EQ(games[0].launch_os, "linux");
+  EXPECT_EQ(games[0].launch_working_dir, install / "Linux");
+#endif
   fs::remove_all(base, ec);
 }
 
