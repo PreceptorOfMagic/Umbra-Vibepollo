@@ -5383,6 +5383,11 @@ namespace video {
       std::chrono::steady_clock::time_point last_log = std::chrono::steady_clock::now();
     } loop_stats;
 
+    // Umbra: a CO-OP pane's floor counts from the last encode START. The image wait below otherwise restarts after
+    // encode() returns, so a still pane ran at 1/(max_frametime + encode time) -- measured 2026-10-21 on SKYNET
+    // (3840x1088 NVENC): 21.4 fps against a 30 fps floor, 10.7 against 12. The primary paces the co-op composite.
+    auto coop_last_encode = std::chrono::steady_clock::now();
+
     while (true) {
       if (auto now = std::chrono::steady_clock::now(); now - loop_stats.last_log >= 10s) {
         BOOST_LOG(debug) << "Encode loop [" << channel_data << "] " << config.width << 'x' << config.height
@@ -5527,6 +5532,12 @@ namespace video {
           image_wait_budget = std::min(image_wait_budget, remaining_tail_budget);
         }
 
+        if (config.umbra_coop) {
+          const auto since = std::chrono::steady_clock::now() - coop_last_encode;
+          const auto remaining = since < max_frametime ? max_frametime - since : decltype(max_frametime)::zero();
+          image_wait_budget = std::min(image_wait_budget, remaining);
+        }
+
         if (auto img = images->pop(image_wait_budget)) {
           placeholder_input = is_placeholder_capture_image(*img);
           if (placeholder_input) {
@@ -5597,6 +5608,7 @@ namespace video {
         continue;
       }
 
+      coop_last_encode = std::chrono::steady_clock::now();
       if (encode(frame_nr++, *session, packets, channel_data, frame_timestamp, capture_timestamp, host_processing_timestamp)) {
         BOOST_LOG(error) << "Could not encode video packet"sv;
         native_amf_runtime_failed = native_amf_session;
