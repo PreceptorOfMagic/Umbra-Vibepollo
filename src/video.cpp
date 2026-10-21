@@ -5269,6 +5269,15 @@ namespace video {
 
     // set max frame time based on client-requested target framerate.
     double minimum_fps_target = (config::video.minimum_fps_target > 0.0) ? config::video.minimum_fps_target * 1000 : std::max(config.encodingFramerate / 5, 10000);
+    // Umbra: a CO-OP pane keeps at least 30 fps (never above the stream's own rate) when the floor is derived. The
+    // primary paces the client's composite, and the partner's waiting frames are only drained when a primary frame
+    // arrives, so a still primary at fps/5 -- 12 fps for a 60 fps client such as the SHIELD TV -- delivered the
+    // partner's frames in bursts at that pace (measured 2026-10-21: 11 primary pictures/s carrying ~5 partner
+    // pictures each). 30 is the floor at which a still primary dropped no partner frames (2026-10-13), and a 165 fps
+    // client already gets 33 from fps/5, so the TV is unchanged. An explicit minimum_fps_target still wins.
+    if (config::video.minimum_fps_target <= 0.0 && config.umbra_coop) {
+      minimum_fps_target = std::max(minimum_fps_target, (double) std::min(config.encodingFramerate, 30000));
+    }
     auto max_frametime = std::chrono::nanoseconds(1000ms) * 1000 / minimum_fps_target;
     auto encode_frame_threshold = std::chrono::nanoseconds(1000ms) * 1000 / config.encodingFramerate;
     auto frame_variation_threshold = encode_frame_threshold / 4;
