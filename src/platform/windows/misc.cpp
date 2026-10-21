@@ -136,6 +136,10 @@ namespace platf {
   std::mutex mouse_keys_mutex;
   bool enabled_mouse_keys = false;
   MOUSEKEYS previous_mouse_keys_state;
+  // The Mouse Keys state we applied, and when/how often it was re-applied (see enable_mouse_keys).
+  MOUSEKEYS applied_mouse_keys_state;
+  std::chrono::steady_clock::time_point mouse_keys_rearmed_at;
+  int mouse_keys_rearms_without_mouse = 0;
 
   HANDLE qos_handle = nullptr;
 
@@ -1618,6 +1622,26 @@ namespace platf {
     // temporary settings on the next check.
     const auto lock = std::lock_guard(mouse_keys_mutex);
     if (enabled_mouse_keys) {
+      // A real mouse that arrives and then leaves while Mouse Keys is on (a KVM switched to this PC
+      // and away again) makes Windows stop counting Mouse Keys as a mouse: SM_MOUSEPRESENT drops to 0
+      // and the cursor is hidden although Mouse Keys is still on. Turning it off and on again brings
+      // the cursor back. This runs every frame, so try at most every 2 seconds, and give up after 3
+      // tries that did not help until a mouse is seen again.
+      if (GetSystemMetrics(SM_MOUSEPRESENT)) {
+        mouse_keys_rearms_without_mouse = 0;
+      } else if (mouse_keys_rearms_without_mouse < 3 && std::chrono::steady_clock::now() - mouse_keys_rearmed_at >= 2s) {
+        mouse_keys_rearmed_at = std::chrono::steady_clock::now();
+        ++mouse_keys_rearms_without_mouse;
+        MOUSEKEYS off_mouse_keys_state = applied_mouse_keys_state;
+        off_mouse_keys_state.dwFlags &= ~MKF_MOUSEKEYSON;
+        if (SystemParametersInfoW(SPI_SETMOUSEKEYS, 0, &off_mouse_keys_state, 0) &&
+            SystemParametersInfoW(SPI_SETMOUSEKEYS, 0, &applied_mouse_keys_state, 0)) {
+          BOOST_LOG(info) << "The mouse went away while Mouse Keys was on (KVM switch?). Sunshine re-enabled Mouse Keys to bring the mouse cursor back.";
+        } else {
+          auto winerr = GetLastError();
+          BOOST_LOG(warning) << "Unable to re-enable Mouse Keys: "sv << winerr;
+        }
+      }
       return;
     }
 
@@ -1638,6 +1662,8 @@ namespace platf {
         if (SystemParametersInfoW(SPI_SETMOUSEKEYS, 0, &new_mouse_keys_state, 0)) {
           // Remember to restore the previous settings when we stop streaming
           enabled_mouse_keys = true;
+          applied_mouse_keys_state = new_mouse_keys_state;
+          mouse_keys_rearms_without_mouse = 0;
         } else {
           auto winerr = GetLastError();
           BOOST_LOG(warning) << "Unable to enable Mouse Keys: "sv << winerr;
