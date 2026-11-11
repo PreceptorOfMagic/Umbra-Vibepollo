@@ -809,6 +809,10 @@ namespace platf {
   void set_thread_name(const std::string &name);
 
   void enable_mouse_keys();
+  // Mouse Keys is only enabled (or re-armed) once the client has sent mouse input in the current
+  // session: a controller-only session never makes a mouse appear to a running game.
+  void note_client_mouse_input(std::uint32_t magic);
+  void reset_client_mouse_input();
 
   // Allow OS-specific actions to be taken to prepare for streaming
   void streaming_will_start();

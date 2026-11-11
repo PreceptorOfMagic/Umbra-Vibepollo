@@ -140,6 +140,13 @@ namespace platf {
   MOUSEKEYS applied_mouse_keys_state;
   std::chrono::steady_clock::time_point mouse_keys_rearmed_at;
   int mouse_keys_rearms_without_mouse = 0;
+  // Set by the first mouse packet from the client in a session (note_client_mouse_input), cleared
+  // when a session's input is allocated. Until it is set, enable_mouse_keys() neither enables nor
+  // re-arms Mouse Keys: with only a controller in use, a mouse appearing to Windows mid-game can
+  // leave a game showing the Windows cursor (Dragon's Dogma 2 after a resume, 2026-11-11; the
+  // 10-21 re-arm fired 1.7 s into that resume -- suspected, not yet proven, as the trigger).
+  std::atomic<bool> client_mouse_input_seen {false};
+  bool mouse_keys_deferral_logged = false;
 
   HANDLE qos_handle = nullptr;
 
@@ -1616,11 +1623,32 @@ namespace platf {
     enable_mouse_keys();
   }
 
+  void note_client_mouse_input(std::uint32_t magic) {
+    if (!client_mouse_input_seen.exchange(true)) {
+      BOOST_LOG(info) << "First client mouse input this session (magic 0x"sv << std::hex << magic << std::dec
+                      << "); Mouse Keys may now be enabled if Windows reports no mouse.";
+    }
+  }
+
+  void reset_client_mouse_input() {
+    const auto lock = std::lock_guard(mouse_keys_mutex);
+    client_mouse_input_seen = false;
+    mouse_keys_deferral_logged = false;
+  }
+
   void enable_mouse_keys() {
     // Capture threads check every frame, including concurrent streams. Keep the
     // original snapshot until restoration succeeds instead of saving our own
     // temporary settings on the next check.
     const auto lock = std::lock_guard(mouse_keys_mutex);
+    if (!client_mouse_input_seen && !GetSystemMetrics(SM_MOUSEPRESENT)) {
+      if (!mouse_keys_deferral_logged) {
+        mouse_keys_deferral_logged = true;
+        BOOST_LOG(info) << "Windows reports no mouse; Mouse Keys "sv << (enabled_mouse_keys ? "re-arm"sv : "enable"sv)
+                        << " deferred until the client sends mouse input (keeps a controller-only game from seeing a mouse appear).";
+      }
+      return;
+    }
     if (enabled_mouse_keys) {
       // A real mouse that arrives and then leaves while Mouse Keys is on (a KVM switched to this PC
       // and away again) makes Windows stop counting Mouse Keys as a mouse: SM_MOUSEPRESENT drops to 0

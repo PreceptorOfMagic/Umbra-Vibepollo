@@ -1778,6 +1778,20 @@ namespace input {
     // Print the final input packet
     input::print((void *) payload);
 
+    // Mouse Keys waits for real mouse use by the client (see platf::enable_mouse_keys).
+    switch (util::endian::little(payload->magic)) {
+      case MOUSE_MOVE_REL_MAGIC_GEN5:
+      case MOUSE_MOVE_ABS_MAGIC:
+      case MOUSE_BUTTON_DOWN_EVENT_MAGIC_GEN5:
+      case MOUSE_BUTTON_UP_EVENT_MAGIC_GEN5:
+      case SCROLL_MAGIC_GEN5:
+      case SS_HSCROLL_MAGIC:
+        platf::note_client_mouse_input(util::endian::little(payload->magic));
+        break;
+      default:
+        break;
+    }
+
     // Send the batched input to the OS
     switch (util::endian::little(payload->magic)) {
       case MOUSE_MOVE_REL_MAGIC_GEN5:
@@ -2016,6 +2030,9 @@ namespace input {
       mail->event<input::touch_port_t>(mail::touch_port),
       mail->queue<platf::gamepad_feedback_msg_t>(mail::gamepad_feedback)
     );
+
+    // A new session (including a resume) starts with no client mouse use seen.
+    platf::reset_client_mouse_input();
 
     // Workaround to ensure new frames will be captured when a client connects
     task_pool.pushDelayed([]() {

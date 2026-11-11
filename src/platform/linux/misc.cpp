@@ -666,6 +666,14 @@ namespace platf {
     // Unimplemented
   }
 
+  void note_client_mouse_input(std::uint32_t) {
+    // Unimplemented
+  }
+
+  void reset_client_mouse_input() {
+    // Unimplemented
+  }
+
   void streaming_will_start() {
     // Display power is owned by pending/active capture, not retained topology.
   }
