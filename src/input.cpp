@@ -1781,6 +1781,15 @@ namespace input {
     // Mouse Keys waits for real mouse use by the client (see platf::enable_mouse_keys).
     switch (util::endian::little(payload->magic)) {
       case MOUSE_MOVE_REL_MAGIC_GEN5:
+        {
+          const auto rel = (PNV_REL_MOUSE_MOVE_PACKET) payload;
+          platf::note_client_mouse_input(
+            util::endian::little(payload->magic),
+            util::endian::big(rel->deltaX),
+            util::endian::big(rel->deltaY)
+          );
+        }
+        break;
       case MOUSE_MOVE_ABS_MAGIC:
       case MOUSE_BUTTON_DOWN_EVENT_MAGIC_GEN5:
       case MOUSE_BUTTON_UP_EVENT_MAGIC_GEN5:

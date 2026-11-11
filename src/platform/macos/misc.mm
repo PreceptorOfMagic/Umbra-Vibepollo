@@ -304,7 +304,7 @@ namespace platf {
     // Unimplemented
   }
 
-  void note_client_mouse_input(std::uint32_t) {
+  void note_client_mouse_input(std::uint32_t, int, int) {
     // Unimplemented
   }
 

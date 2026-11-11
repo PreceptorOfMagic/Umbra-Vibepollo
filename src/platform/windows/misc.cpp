@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <csignal>
+#include <cstdlib>
 #include <filesystem>
 #include <iomanip>
 #include <iterator>
@@ -146,6 +147,11 @@ namespace platf {
   // leave a game showing the Windows cursor (Dragon's Dogma 2 after a resume, 2026-11-11; the
   // 10-21 re-arm fired 1.7 s into that resume -- suspected, not yet proven, as the trigger).
   std::atomic<bool> client_mouse_input_seen {false};
+  // Sum of |dx|+|dy| of relative moves this session. moonlight-common-c sends (1,1) then (-1,-1) at
+  // every connect "to wake the display up" (Connection.c), which totals 4: measured 2026-11-12, it
+  // released the deferral within 0.3 s of every resume. Relative moves count only above this.
+  std::atomic<int> client_mouse_rel_travel {0};
+  constexpr int client_mouse_rel_travel_threshold = 8;
   bool mouse_keys_deferral_logged = false;
 
   HANDLE qos_handle = nullptr;
@@ -1623,7 +1629,18 @@ namespace platf {
     enable_mouse_keys();
   }
 
-  void note_client_mouse_input(std::uint32_t magic) {
+  void note_client_mouse_input(std::uint32_t magic, int rel_dx, int rel_dy) {
+    if (client_mouse_input_seen) {
+      return;
+    }
+    if (rel_dx != 0 || rel_dy != 0) {
+      const int travel = client_mouse_rel_travel.fetch_add(std::abs(rel_dx) + std::abs(rel_dy)) + std::abs(rel_dx) + std::abs(rel_dy);
+      if (travel < client_mouse_rel_travel_threshold) {
+        return;
+      }
+    } else if (magic == 0x7 /* MOUSE_MOVE_REL_MAGIC_GEN5 with no movement */) {
+      return;
+    }
     if (!client_mouse_input_seen.exchange(true)) {
       BOOST_LOG(info) << "First client mouse input this session (magic 0x"sv << std::hex << magic << std::dec
                       << "); Mouse Keys may now be enabled if Windows reports no mouse.";
@@ -1633,6 +1650,7 @@ namespace platf {
   void reset_client_mouse_input() {
     const auto lock = std::lock_guard(mouse_keys_mutex);
     client_mouse_input_seen = false;
+    client_mouse_rel_travel = 0;
     mouse_keys_deferral_logged = false;
   }
 

@@ -811,7 +811,9 @@ namespace platf {
   void enable_mouse_keys();
   // Mouse Keys is only enabled (or re-armed) once the client has sent mouse input in the current
   // session: a controller-only session never makes a mouse appear to a running game.
-  void note_client_mouse_input(std::uint32_t magic);
+  // rel_dx/rel_dy: the movement of a relative move packet (0 for other packets). Relative moves only
+  // count once they add up to more than moonlight-common-c's connect-time display-wake wiggle.
+  void note_client_mouse_input(std::uint32_t magic, int rel_dx = 0, int rel_dy = 0);
   void reset_client_mouse_input();
 
   // Allow OS-specific actions to be taken to prepare for streaming
