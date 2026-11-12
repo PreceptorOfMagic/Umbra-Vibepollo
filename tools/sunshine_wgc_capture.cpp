@@ -138,6 +138,10 @@ static std::mutex g_config_mutex;
 static std::condition_variable g_config_cv;
 static std::atomic<int32_t> g_activity_admission_fps {120};
 static std::atomic<uint32_t> g_activity_admission_generation {0};
+// Whether the session draws the cursor into frames. Default ON (WGC's own default), so a
+// main process that never sends cursor_capture_data_t keeps the old behaviour.
+static std::atomic<bool> g_cursor_capture_enabled {true};
+static std::atomic<uint32_t> g_cursor_capture_generation {0};
 
 /**
  * @brief Flag indicating whether configuration data has been received from main process.
@@ -1106,6 +1110,7 @@ private:
   uint64_t _last_diagnostics_slow_copy = 0;
   uint64_t _last_diagnostics_activity_rate_limited = 0;
   uint32_t _activity_admission_generation = 0;
+  uint32_t _cursor_capture_generation = 0;
   std::chrono::steady_clock::time_point _last_activity_admitted {};
   std::mutex _delivery_mutex;
   std::condition_variable _delivery_cv;
@@ -1309,7 +1314,26 @@ public:
    * @brief Processes a frame when the frame arrived event is triggered.
    * @param sender The frame pool that triggered the event.
    */
+  /** Apply the latest requested cursor capture state to the live session (no-op if unchanged). */
+  void apply_cursor_capture() {
+    const auto generation = g_cursor_capture_generation.load(std::memory_order_acquire);
+    if (generation == _cursor_capture_generation || !_capture_session) {
+      return;
+    }
+    _cursor_capture_generation = generation;
+    const bool enabled = g_cursor_capture_enabled.load(std::memory_order_relaxed);
+    try {
+      _capture_session.IsCursorCaptureEnabled(enabled);
+      BOOST_LOG(info) << "WGC cursor capture " << (enabled ? "enabled" : "disabled");
+    } catch (const winrt::hresult_error &ex) {
+      BOOST_LOG(warning) << "IsCursorCaptureEnabled(" << enabled << ") failed: " << ex.code() << " - " << winrt::to_string(ex.message());
+    } catch (...) {
+      BOOST_LOG(warning) << "IsCursorCaptureEnabled(" << enabled << ") threw an unknown exception";
+    }
+  }
+
   void process_frame(Direct3D11CaptureFramePool const &sender) {
+    apply_cursor_capture();
     // Track callback invocations
     static std::atomic<uint64_t> callback_count {0};
     auto cc = ++callback_count;
@@ -2001,6 +2025,11 @@ public:
       }
     }
 
+    // Start with the requested cursor state rather than WGC's default (ON), so the first frames
+    // already match it. A later change arrives through cursor_capture_data_t.
+    _cursor_capture_generation = g_cursor_capture_generation.load(std::memory_order_acquire) - 1;
+    apply_cursor_capture();
+
     if (winrt::Windows::Foundation::Metadata::ApiInformation::IsPropertyPresent(L"Windows.Graphics.Capture.GraphicsCaptureSession", L"MinUpdateInterval")) {
       if (g_config.min_update_interval_100ns > 0) {
         _capture_session.MinUpdateInterval(winrt::Windows::Foundation::TimeSpan {g_config.min_update_interval_100ns});
@@ -2146,6 +2175,18 @@ std::string get_temp_log_path() {
  *
  */
 void handle_ipc_message(std::span<const uint8_t> message) {
+  if (message.size() == sizeof(platf::dxgi::cursor_capture_data_t)) {
+    platf::dxgi::cursor_capture_data_t update {};
+    memcpy(&update, message.data(), sizeof(update));
+    if (update.magic != platf::dxgi::WGC_CURSOR_CAPTURE_MESSAGE_MAGIC) {
+      BOOST_LOG(warning) << "Ignoring invalid WGC cursor capture update";
+      return;
+    }
+    g_cursor_capture_enabled.store(update.enabled != 0, std::memory_order_relaxed);
+    g_cursor_capture_generation.fetch_add(1, std::memory_order_acq_rel);
+    return;
+  }
+
   if (message.size() == sizeof(platf::dxgi::activity_admission_data_t)) {
     platf::dxgi::activity_admission_data_t update {};
     memcpy(&update, message.data(), sizeof(update));

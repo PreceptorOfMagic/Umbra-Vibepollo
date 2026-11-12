@@ -140,6 +140,8 @@ namespace platf::dxgi {
      * WGC or changing the display mode. This is safe from the activity worker.
      */
     bool set_activity_admission_fps(int fps);
+    /** Whether the helper draws the cursor into frames; sent only when it changes (and on helper start). */
+    bool set_cursor_capture(bool enabled);
 
     /**
      * @brief Read the static descriptor of the shared texture without acquiring the keyed mutex.
@@ -205,6 +207,9 @@ namespace platf::dxgi {
     ::video::config_t _config;  ///< Cached video config.
     std::string _display_name;  ///< Display name copy.
     bool _advanced_color_capture = false;  ///< True when target display is already Advanced Color/HDR.
+    bool send_cursor_capture(bool enabled);
+    std::atomic<bool> _cursor_capture {true};  ///< Latest desired cursor capture, retained across helper restarts.
+    bool _cursor_capture_sent = false;
     std::atomic<int> _activity_admission_fps {0};  ///< Latest desired helper admission rate, retained across helper restarts.
     std::chrono::steady_clock::time_point _last_helper_stop {};  ///< Last time we tore down the helper.
   };

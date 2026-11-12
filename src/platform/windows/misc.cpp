@@ -1647,6 +1647,10 @@ namespace platf {
     }
   }
 
+  bool client_mouse_in_use() {
+    return client_mouse_input_seen.load(std::memory_order_relaxed);
+  }
+
   void reset_client_mouse_input() {
     const auto lock = std::lock_guard(mouse_keys_mutex);
     client_mouse_input_seen = false;

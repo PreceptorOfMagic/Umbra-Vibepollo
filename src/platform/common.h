@@ -815,6 +815,10 @@ namespace platf {
   // count once they add up to more than moonlight-common-c's connect-time display-wake wiggle.
   void note_client_mouse_input(std::uint32_t magic, int rel_dx = 0, int rel_dy = 0);
   void reset_client_mouse_input();
+  // True once the client has used a mouse in this session (see note_client_mouse_input). Windows
+  // capture draws the cursor into the stream only then: controller, remote-wheel and host-side
+  // device changes never put a cursor on the client's screen.
+  bool client_mouse_in_use();
 
   // Allow OS-specific actions to be taken to prepare for streaming
   void streaming_will_start();

@@ -104,6 +104,18 @@ namespace platf::dxgi {
     int32_t admission_fps;
   };
 
+  constexpr uint32_t WGC_CURSOR_CAPTURE_MESSAGE_MAGIC = 0x57474343;  // "WGCC"
+
+  // Runtime-only update: whether WGC draws the mouse cursor into captured frames
+  // (GraphicsCaptureSession.IsCursorCaptureEnabled). Applied to the live session; no
+  // resources are recreated. 12 bytes so the helper's size dispatch cannot confuse it
+  // with activity_admission_data_t (8 bytes).
+  struct cursor_capture_data_t {
+    uint32_t magic;
+    uint32_t enabled;
+    uint32_t reserved;
+  };
+
   /**
    * @brief Result codes for pipe operations.
    */

@@ -649,7 +649,7 @@ namespace platf::dxgi {
             sleep_overshoot_logger.first_point(sleep_target);
             sleep_overshoot_logger.second_point_now_and_log();
 
-            status = snapshot(pull_free_image_cb, img_out, 0ms, *cursor);
+            status = snapshot(pull_free_image_cb, img_out, 0ms, *cursor && platf::client_mouse_in_use());
 
             if (status == capture_e::ok && img_out) {
               frame_pacing_group_frames += 1;
@@ -665,7 +665,7 @@ namespace platf::dxgi {
 
       // Start new frame pacing group if necessary, snapshot() is called with non-zero timeout
       if (status == capture_e::timeout || (status == capture_e::ok && !frame_pacing_group_start)) {
-        status = snapshot(pull_free_image_cb, img_out, 200ms, *cursor);
+        status = snapshot(pull_free_image_cb, img_out, 200ms, *cursor && platf::client_mouse_in_use());
 
         if (status == capture_e::ok && img_out) {
           auto raw_anchor = img_out->capture_pacing_timestamp ? img_out->capture_pacing_timestamp : img_out->frame_timestamp;

@@ -1793,11 +1793,11 @@ namespace input {
       case MOUSE_MOVE_ABS_MAGIC:
       case MOUSE_BUTTON_DOWN_EVENT_MAGIC_GEN5:
       case MOUSE_BUTTON_UP_EVENT_MAGIC_GEN5:
-      case SCROLL_MAGIC_GEN5:
-      case SS_HSCROLL_MAGIC:
         platf::note_client_mouse_input(util::endian::little(payload->magic));
         break;
       default:
+        // Scrolling alone is not mouse use: a TV remote's wheel sends it (measured 2026-11-12, magic
+        // 0xa released the deferral 19 s into a controller-only resume). Moving or clicking still counts.
         break;
     }
 

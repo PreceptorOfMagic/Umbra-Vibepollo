@@ -270,6 +270,8 @@ namespace platf::dxgi {
       BOOST_LOG(warning) << "WGC IPC helper failed to initialize; requesting capture reinit.";
       return capture_e::reinit;
     }
+    // WGC draws the cursor itself (DXGI blends it here instead): pass the wish on. Sent only on change.
+    (void) _ipc_session->set_cursor_capture(cursor_visible);
 
     timeout = effective_wgc_timeout(timeout, _config.framerate);
 
@@ -539,6 +541,8 @@ namespace platf::dxgi {
       BOOST_LOG(warning) << "WGC IPC helper failed to initialize; requesting capture reinit.";
       return capture_e::reinit;
     }
+    // WGC draws the cursor itself (DXGI blends it here instead): pass the wish on. Sent only on change.
+    (void) _ipc_session->set_cursor_capture(cursor_visible);
 
     winrt::com_ptr<ID3D11Texture2D> gpu_tex;
     uint64_t frame_qpc = 0;

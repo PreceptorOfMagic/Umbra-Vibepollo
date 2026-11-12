@@ -480,6 +480,30 @@ namespace platf::dxgi {
     if (_activity_admission_fps.load(std::memory_order_relaxed) != config_data.activity_admission_fps) {
       (void) set_activity_admission_fps(_activity_admission_fps.load(std::memory_order_relaxed));
     }
+    // A new helper starts with WGC's default (cursor ON): tell it the current wish.
+    (void) send_cursor_capture(_cursor_capture.load(std::memory_order_relaxed));
+  }
+
+  bool ipc_session_t::set_cursor_capture(const bool enabled) {
+    if (_cursor_capture.exchange(enabled, std::memory_order_relaxed) == enabled && _cursor_capture_sent) {
+      return true;
+    }
+    return send_cursor_capture(enabled);
+  }
+
+  bool ipc_session_t::send_cursor_capture(const bool enabled) {
+    if (!_pipe || !_initialized || !_pipe->is_connected()) {
+      _cursor_capture_sent = false;
+      return false;
+    }
+    const cursor_capture_data_t update {
+      .magic = WGC_CURSOR_CAPTURE_MESSAGE_MAGIC,
+      .enabled = enabled ? 1u : 0u,
+      .reserved = 0,
+    };
+    _pipe->send(std::span<const uint8_t>(reinterpret_cast<const uint8_t *>(&update), sizeof(update)));
+    _cursor_capture_sent = true;
+    return true;
   }
 
   bool ipc_session_t::set_activity_admission_fps(const int fps) {
