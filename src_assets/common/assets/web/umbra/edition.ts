@@ -13,3 +13,7 @@ export const UPSTREAM_REPO = 'https://github.com/Nonary/Vibepollo';
 export const UPSTREAM_RELEASES_API = 'https://api.github.com/repos/Nonary/Vibepollo/releases';
 export const HUB = 'https://preceptorofmagic.github.io/Eclipse-Umbra-Project-Hub/';
 export const ECLIPSE_REPO = 'https://github.com/PreceptorOfMagic/Eclipse';
+// The release list Eclipse and Umbra share for their update notices (the hub's site/updates.json), and this
+// edition's key in it. A release published there with "notify": false is not announced (umbra/updates.ts).
+export const UPDATES_URL = HUB + 'updates.json';
+export const UPDATES_PRODUCT = 'umbra-vibepollo';

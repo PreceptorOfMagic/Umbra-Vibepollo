@@ -9,10 +9,12 @@ import { InlineAlert, UiIcon } from '@/components/ui';
 import {
   ECLIPSE_REPO,
   HUB,
-  UMBRA_RELEASES_API,
   UMBRA_REPO,
+  UPDATES_PRODUCT,
+  UPDATES_URL,
   UPSTREAM_RELEASES_API,
 } from '@/umbra/edition';
+import { evaluateUpdates, type UpdateNotice } from '@/umbra/updates';
 
 interface Parsed {
   base: string | null;
@@ -27,6 +29,8 @@ const { t } = useI18n();
 const installed = ref<(Parsed & { raw: string }) | null>(null);
 const upstream = ref<Release | null>(null);
 const umbra = ref<Release | null>(null);
+const notice = ref<UpdateNotice | null>(null); // the announced Umbra release, from the hub's updates.json
+const updatesLoaded = ref(false);
 const state = ref<'loading' | 'unknown' | 'up_to_date' | 'upstream_new_umbra_not' | 'upstream_new_umbra_has' | 'umbra_update'>('loading');
 
 // This edition's versions are '<Vibepollo release>-umbra.<n>', e.g. 2.0.0-umbra.1 (BUILD_VERSION at build
@@ -69,20 +73,38 @@ async function latest(api: string, pre: boolean): Promise<Release | null> {
   }
 }
 
+// Umbra's own releases come from the hub's list, not GitHub's "latest": a release can be published there
+// WITHOUT being announced ("notify": false). Null when the list cannot be read.
+async function hubUpdates(platform: string, raw: string): Promise<{ notice: UpdateNotice | null } | null> {
+  try {
+    const r = await fetch(UPDATES_URL, { headers: { Accept: 'application/json' }, credentials: 'omit', cache: 'no-store' });
+    if (!r.ok) return null;
+    return { notice: evaluateUpdates(await r.json(), UPDATES_PRODUCT, platform, raw) };
+  } catch {
+    return null;
+  }
+}
+
 onMounted(async () => {
   let pre = false;
+  let platform = 'windows';
   try {
     const config = await apiGet<Record<string, unknown>>('/api/config');
     installed.value = { raw: String(config.version ?? ''), ...parse(String(config.version ?? '')) };
     pre = ['true', 'yes', 'enable', 'enabled', 'on', '1'].includes(
       String(config.notify_pre_releases ?? '').trim().toLowerCase(),
     );
+    if (typeof config.platform === 'string' && config.platform) platform = config.platform;
   } catch {
     // Leave the installed version unknown.
   }
-  const [a, u] = await Promise.all([latest(UPSTREAM_RELEASES_API, pre), latest(UMBRA_RELEASES_API, pre)]);
+  const [a, hub] = await Promise.all([latest(UPSTREAM_RELEASES_API, pre), hubUpdates(platform, installed.value?.raw ?? '')]);
   upstream.value = a && a.base ? a : null;
-  umbra.value = u && u.base ? u : null;
+  updatesLoaded.value = hub !== null;
+  notice.value = hub?.notice ?? null;
+  umbra.value = notice.value
+    ? { tag: notice.value.latest, url: notice.value.downloadUrl ?? UMBRA_REPO + '/releases', ...parseTag(notice.value.latest) }
+    : null;
   const base = installed.value?.base;
   if (!upstream.value || !base) {
     state.value = 'unknown';
@@ -127,10 +149,23 @@ onMounted(async () => {
       >
         <a :href="umbra.url" target="_blank" rel="noopener noreferrer">{{ t('umbra.download_umbra', { umbra: umbra.tag }) }}</a>
       </InlineAlert>
-      <InlineAlert v-else-if="state === 'umbra_update' && umbra" tone="warning" :title="t('umbra.umbra_update', { umbra: umbra.tag })">
+      <InlineAlert v-else-if="state === 'umbra_update' && umbra" tone="info" :title="t('umbra.umbra_update', { umbra: umbra.tag })">
         <a :href="umbra.url" target="_blank" rel="noopener noreferrer">{{ t('umbra.download_umbra', { umbra: umbra.tag }) }}</a>
       </InlineAlert>
-      <p v-if="upstream && !umbra" class="umbra-card__muted">{{ t('umbra.umbra_unknown') }}</p>
+      <!-- What the announced release brings, folded away until asked for. -->
+      <details v-if="notice && (state === 'umbra_update' || state === 'upstream_new_umbra_has')" class="umbra-card__whats-new">
+        <summary>{{ t('umbra.whats_new') }}</summary>
+        <template v-for="r in notice.releases" :key="r.version">
+          <p class="umbra-card__release">
+            <strong>{{ r.version }}</strong><span v-if="r.date" class="umbra-card__muted"> ({{ r.date }})</span>
+          </p>
+          <ul v-if="r.highlights.length">
+            <li v-for="h in r.highlights" :key="h">{{ h }}</li>
+          </ul>
+        </template>
+        <p v-if="notice.howToUpdate"><strong>{{ t('umbra.how_to_update') }}</strong> {{ notice.howToUpdate }}</p>
+      </details>
+      <p v-if="upstream && !updatesLoaded" class="umbra-card__muted">{{ t('umbra.umbra_unknown') }}</p>
     </template>
 
     <h3>{{ t('umbra.resources') }}</h3>
