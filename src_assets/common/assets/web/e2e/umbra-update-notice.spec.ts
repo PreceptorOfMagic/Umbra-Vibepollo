@@ -4,10 +4,16 @@ import { test, expect, type Page } from '@playwright/test';
 // Project Hub's updates.json, and a release published there with "notify": false is not announced.
 
 const INSTALLED = '2.0.0-umbra.1';
+// GitHub and GitHub Pages both answer cross-origin reads with this; without it the browser drops the reply.
+const CORS = { 'Access-Control-Allow-Origin': '*' };
 
 async function host(page: Page, releases: Record<string, unknown>[]) {
   await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (!path.startsWith('/api/')) {
+      await route.continue(); // the dev server's own /v2/api/*.ts modules
+      return;
+    }
     let body: unknown = { status: true };
     if (path === '/api/auth/status') body = { authenticated: true, login_required: false, credentials_configured: true };
     else if (path === '/api/configLocale') body = { locale: 'en' };
@@ -21,11 +27,12 @@ async function host(page: Page, releases: Record<string, unknown>[]) {
     await route.fulfill({ json: body });
   });
   // Vibepollo upstream: not newer than the installed base, so only Umbra's own notice is in play.
-  await page.route('https://api.github.com/repos/Nonary/Vibepollo/releases**', (route) =>
-    route.fulfill({ json: { tag_name: 'v2.0.0', html_url: 'https://example.invalid/vibepollo', prerelease: false } }),
+  await page.route(/^https:\/\/api\.github\.com\/repos\/Nonary\/Vibepollo\/releases/, (route) =>
+    route.fulfill({ headers: CORS, json: { tag_name: 'v2.0.0', html_url: 'https://example.invalid/vibepollo', prerelease: false } }),
   );
   await page.route('https://preceptorofmagic.github.io/Eclipse-Umbra-Project-Hub/updates.json', (route) =>
     route.fulfill({
+      headers: CORS,
       json: {
         schema: 1,
         'umbra-vibepollo': {
