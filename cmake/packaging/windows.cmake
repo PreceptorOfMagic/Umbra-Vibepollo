@@ -494,6 +494,14 @@ if(SUNSHINE_BUNDLE_VHF_GAMEPAD_DRIVER)
     endif()
 endif()
 
+# HidHide installer (Nefarius, MIT; signed by Nefarius Software Solutions e.U.) and the scripts that install it
+# silently and remove it only if this product installed it (custom_actions.wxs InstallHidHide/UninstallHidHide).
+set(HIDHIDE_INSTALLER "${CMAKE_BINARY_DIR}/hidhide_installer.exe")
+file(DOWNLOAD "https://github.com/nefarius/HidHide/releases/download/v1.5.230.0/HidHide_1.5.230_x64.exe"
+        ${HIDHIDE_INSTALLER} EXPECTED_HASH SHA256=f4bbbcb82e6258641b887c74bc81c4c5f66e4aa811808dfc304347687b7605f6 TIMEOUT 60)
+install(FILES ${HIDHIDE_INSTALLER} DESTINATION "scripts" RENAME "hidhide_installer.exe" COMPONENT assets)
+install(DIRECTORY "${SUNSHINE_SOURCE_ASSETS_DIR}/windows/misc/hidhide/" DESTINATION "scripts" COMPONENT assets)
+
 # Mandatory scripts
 install(FILES "${SUNSHINE_SOURCE_ASSETS_DIR}/windows/misc/sunshine-setup.ps1"
         DESTINATION "scripts"
