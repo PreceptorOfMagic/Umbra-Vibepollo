@@ -67,17 +67,3 @@
   gap: 4px;
   color: var(--vs-color-accent-default);
 }
-
-/* The update notice's release list, folded away until asked for (UmbraCard.vue). */
-.umbra-card__whats-new {
-  margin: 0.5rem 0 1rem;
-}
-.umbra-card__whats-new summary {
-  cursor: pointer;
-}
-.umbra-card__whats-new ul {
-  margin: 0.25rem 0 0.75rem;
-}
-.umbra-card__release {
-  margin: 0.5rem 0 0;
-}
