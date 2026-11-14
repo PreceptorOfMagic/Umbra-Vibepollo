@@ -36,15 +36,20 @@ Once approved: free code signing provided by [SignPath.io](https://about.signpat
 
 ## Privacy
 
-This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.
+Umbra (Vibepollo) collects no personal data and has no telemetry or analytics. It makes these network connections, and no
+others:
 
-In practice, Umbra:
-
-- streams only to devices you pair with it, and announces itself on your local network (mDNS) so those devices can find it;
+- streams only to devices you pair with it, and announces itself on your local network (mDNS) so those devices can
+  find it;
 - maps its ports on your router through UPnP only if you turn that setting on (it is off by default);
-- has a settings page that, when you open it in your browser, asks GitHub for the latest Apollo and Umbra releases, to tell you whether an update is out.
+- the Umbra service asks GitHub for this edition's releases at start, once a day while no stream is running, and a
+  few seconds after a stream starts, and shows a Windows notification when a newer one is out (inherited from
+  Vibepollo). Setting `update_check_interval` to `0` turns it off;
+- its settings pages, while open in your browser, ask GitHub for this edition's and Vibepollo's latest releases, to
+  tell you whether an update is out and whether this edition has caught up with Vibepollo.
 
-It has no telemetry or analytics.
+These requests send nothing about you, your PC or your devices beyond what any web request carries: your IP address
+and the program's name and version. They are served by GitHub, whose [privacy statement](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement) applies to them.
 
 ## Reporting
 

@@ -18,8 +18,9 @@ Umbra comes in two versions. Both carry the same additions for Eclipse; they dif
 | | Umbra | Umbra (Vibepollo) |
 |---|---|---|
 | Built on | [Apollo](https://github.com/ClassicOldSong/Apollo) (ClassicOldSong) | [Vibepollo](https://github.com/Nonary/Vibepollo) (Nonary), itself built on Apollo |
-| Installer | NSIS `.exe` | Vibepollo's MSI installer |
-| Upgrades in place | an Apollo install | a Vibepollo install |
+| Platforms | Windows x64, Linux (Flatpak) | Windows x64 |
+| Installer | NSIS `.exe`; Linux Flatpak bundle | Vibepollo's MSI installer |
+| Upgrades in place | an Apollo install | a Vibepollo, Apollo or Umbra install, keeping configuration and pairings |
 
 Pick the version whose base host you would otherwise use. Everything Vibepollo adds over Apollo stays as Vibepollo ships it.
 
