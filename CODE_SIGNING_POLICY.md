@@ -45,9 +45,8 @@ others:
 - the Umbra service asks GitHub for this edition's releases at start, once a day while no stream is running, and a
   few seconds after a stream starts, and shows a Windows notification when a newer one is out (inherited from
   Vibepollo). Setting `update_check_interval` to `0` turns it off;
-- its settings pages, while open in your browser, ask GitHub for this edition's and Vibepollo's latest releases and
-  download the Project Hub's list of Umbra (Vibepollo) releases
-  (`https://preceptorofmagic.github.io/Eclipse-Umbra-Project-Hub/updates.json`), to tell you whether an update is out.
+- its settings pages, while open in your browser, ask GitHub for this edition's and Vibepollo's latest releases, to
+  tell you whether an update is out and whether this edition has caught up with Vibepollo.
 
 These requests send nothing about you, your PC or your devices beyond what any web request carries: your IP address
 and the program's name and version. They are served by GitHub, whose [privacy statement](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement) applies to them.
