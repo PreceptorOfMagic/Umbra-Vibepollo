@@ -1163,7 +1163,10 @@ namespace video {
     int convert(platf::img_t& img) override { return device->convert(img); }
     void request_idr_frame() override { force_idr = true; }
     void request_normal_frame() override { force_idr = false; }
-    void invalidate_ref_frames(int64_t, int64_t) override { force_idr = true; }
+    bool invalidate_ref_frames(int64_t, int64_t) override {
+      force_idr = true;  // answered with an IDR here, so the caller need not request one
+      return true;
+    }
     std::unique_ptr<platf::gpu_hevc_encode_device_t> device;
     bool force_idr = true;
   };
