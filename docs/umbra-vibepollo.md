@@ -83,6 +83,36 @@ Re-applied onto Vibepollo's restructured files (git could not align them): `nvht
 (GPU HEVC session, co-op GOP, AMF intra refresh, loop filter, 2-frame VBV), `process.cpp` (co-op pad inset, Co-op
 Pane, global commands for built-in apps).
 
+### Vibepollo 2.18.9 (2026-11-19, release 2.18.9-umbra.1)
+
+642 Vibepollo commits since 2.0.0; 27 files conflicted. Vibepollo's version was kept where it now does what an
+Umbra change did:
+
+- **WGC cursor**: Vibepollo's `cursor_visibility` message carries the capture's `cursor_visible` flag to the WGC
+  helper, as Umbra's `cursor_capture` message did; Umbra's transport was dropped. The decision (draw the cursor
+  only once the client has used a mouse) stays Umbra's.
+- **Steam Linux-only launch entries** on Windows: Vibepollo's (Umbra's Vibepollo PR #645).
+- **Built-in Virtual Display**: Vibepollo's `make_builtin_virtual_display` applies the global commands and keeps
+  the display on pause; only Umbra's `use_app_identity = true` remains.
+
+Re-applied onto restructured code: the Mouse Keys mouse-use note (`input.cpp`), the co-op minimum-FPS wait
+(`video.cpp`), hooks without a console window (`process.cpp`, inside `command_lifetime::prepare`), the built-in
+Co-op Pane (`assign_unique_generated_app_id`), Quit releasing remote roles (`nvhttp.cpp`, now honouring
+`release_monitor`'s retained-for-retry result), AMF intra refresh after `amd_av1_tiles`, revert-on-disconnect ON
+beside the new `remove_virtual_display_after_restore`, and the GPU HEVC session's `invalidate_ref_frames` (now
+`bool`). Vibepollo moved its update checks into `utils/updates.ts` and `update_release.h`, which also require an
+installer asset by name: both read this edition's releases and accept `Umbra-Vibepollo-windows-x64.exe`.
+
+HidHide moved out of the MSI into the bootstrapper (`UmbraHidHide.cs`): HidHide's installer is itself an MSI and
+failed with 0x80070652 inside ours. Measured on VEGA: removing HidHide leaves its service running until a restart
+(handled: 3010, and a reinstall in that window installs it at the next administrator sign-in), and HidHide's
+installer never finishes when run as SYSTEM (handled: never started as SYSTEM).
+
+Build notes: Vibepollo now needs the .NET SDK (Playnite plugin); `ninja` at full parallelism ran out of memory on an
+8 GB PC (`-j4`); after a commit change, delete `build/generated_versioninfo/*.cache`, `*.stamp` and
+`windows_versioninfo_generated.h` (Vibepollo's FILEVERSION guard). Run `cpack -G WIX` directly after signing the VHF
+package: `package_msi` re-runs the refresh and would replace the signed files.
+
 ## Risks recorded before the first release
 
 2026-10-11: 2.0.0-umbra.1 was installed on all three test PCs and tested live by the maintainer from the TV; the issues

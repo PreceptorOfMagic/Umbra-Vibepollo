@@ -57,7 +57,8 @@ above identify inputs; they are not by themselves a completed source delivery.
 
 - **Shipped form:** the upstream `HidHide_1.5.230_x64.exe` installer is bundled as
   `scripts/hidhide_installer.exe` and installed silently by setup when HidHide is not
-  already present (removed with this product only if this product installed it).
+  already present (removed with this product only if this product installed it). In Umbra (Vibepollo)
+  `setup.exe`/`uninstall.exe` run it before or after the MSI, never from inside it.
 - **Source/release pin:** tag
   [`v1.5.230.0`](https://github.com/nefarius/HidHide/releases/tag/v1.5.230.0).
 - **Installer SHA-256:**
@@ -67,9 +68,11 @@ above identify inputs; they are not by themselves a completed source delivery.
 
 ## ViGEmBus
 
-- **Shipped form:** the upstream
+- **Shipped form (Umbra, Apollo edition):** the upstream
   `ViGEmBus_1.21.442_x64_x86_arm64.exe` installer is bundled as
-  `scripts/vigembus_installer.exe`.
+  `scripts/vigembus_installer.exe`. **Umbra (Vibepollo) does not bundle it** (checked against the
+  2.0.0-umbra.1 and 2.18.9-umbra.1 installers); it ships Vibepollo's VHF virtual gamepad driver instead. The
+  ViGEmClient code above is still compiled in.
 - **Source/release pin:** tag
   [`v1.21.442.0`](https://github.com/nefarius/ViGEmBus/releases/tag/v1.21.442.0).
 - **Installer SHA-256:**
@@ -134,3 +137,34 @@ actual source. The BSD2-Clause licence is installed in
 `licenses/MinHook-BSD-2-Clause.txt`. The old unowned developer-library input
 is replaced by this isolated source-built archive through MINHOOK_LIBRARY and
 its matching MINHOOK_INCLUDE_DIR.
+
+## WebRTC (libwebrtc.dll)
+
+- **Shipped form:** `libwebrtc.dll`, Vibepollo's pinned prebuilt WebRTC artifact, used by the browser stream.
+- **Release pin:** [Nonary/libwebrtc `v1.0.2`](https://github.com/Nonary/libwebrtc/releases/tag/v1.0.2),
+  asset `libwebrtc-1.0.2-windows-x64.zip`, SHA-256
+  `d178fb780c2770ea68d4664ebfe0fe8478ed9b358357bca16551c6eac5eb7148`
+  (`third-party/webrtc-artifacts/windows-x64.json`, verified by `scripts/download_webrtc_release.ps1`).
+- **Source:** WebRTC from [webrtc-sdk/webrtc](https://github.com/webrtc-sdk/webrtc) `m125_release`, revision
+  `db3ba7af86dd6d48174ed35387d11c0794f1a21b`; wrapper Nonary/libwebrtc commit
+  `77bfd898bbe70d21004a543840a1c1cc6503dfee`.
+- **Terms:** WebRTC: BSD-style licence, Copyright (c) 2011, The WebRTC project authors, with Google's patent
+  grant; see `licenses/WebRTC-LICENSE.txt` and `licenses/WebRTC-PATENTS.txt`. Wrapper: MIT; see
+  `licenses/libwebrtc-wrapper-MIT.txt`. The DLL also contains the third-party libraries WebRTC builds in; their
+  licences are in the WebRTC source tree at the revision above.
+
+## usbip-win2 (optional DualSense USB transport)
+
+- **Shipped form:** the upstream Microsoft-signed driver files (`usbip2_ude`, `usbip2_filter`) in
+  `drivers/usbip-win2/`, byte-for-byte as released. Installed only when the user ticks the option in setup
+  (or passes `INSTALL_USBIP_TRANSPORT=1`); not installed by default.
+- **Release pin:** [vadimgrn/usbip-win2 `v.0.9.8.1`](https://github.com/vadimgrn/usbip-win2/releases/tag/v.0.9.8.1),
+  installer SHA-256 `38cad6d4432b52d5bb9409d9ad03b72fdffc4ada4cd3a48fbeca1a2752a8518a`
+  (`cmake/packaging/windows_usbip_contract.cmake`).
+- **Terms:** BSD 2-Clause; Copyright (c) 2021-2026, Vadym Hrynchyshyn. See `licenses/usbip-win2-BSD-2-Clause.txt`
+  (also `drivers/usbip-win2/LICENSE.txt`).
+
+## Windows DualSense USB/audio backend
+
+Vibepollo's DualSense backend uses descriptor references from HIDMaestro (MIT) and libvirtualgamepad's Sony
+report encoder. Their notices are installed as `licenses/dualsense_usbip_NOTICES.txt`.

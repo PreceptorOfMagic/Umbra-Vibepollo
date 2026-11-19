@@ -4,9 +4,9 @@
 
 [Project Hub](https://github.com/PreceptorOfMagic/Eclipse-Umbra-Project-Hub) · [Eclipse](https://github.com/PreceptorOfMagic/Eclipse) · [Umbra (Apollo-based)](https://github.com/PreceptorOfMagic/Umbra) · [Vibepollo](https://github.com/Nonary/Vibepollo)
 
-> **Status: 2.0.0-umbra.1, released and tested.** Installed on the project's three test PCs (Windows 11;
-> RTX 4070, RTX 3070, Radeon RX Vega) over the Apollo-based Umbra, keeping configuration and pairings, and tested
-> live by the maintainer streaming to Eclipse; no further issues were found.
+> **Status: 2.18.9-umbra.1, built on Vibepollo 2.18.9.** Installed on two of the project's test PCs (Windows 11;
+> RTX 4070, RTX 2060 SUPER) over the previous Umbra (Vibepollo) and over the Apollo-based Umbra, keeping
+> configuration and pairings; streams in both directions and a co-op session opened with no errors.
 
 [Download the latest release](https://github.com/PreceptorOfMagic/Umbra-Vibepollo/releases/latest) — the Windows
 x64 installer `.exe` under **Assets**.
@@ -43,5 +43,8 @@ SudoMaker or LizardByte (Sunshine). Report problems with this version here, not 
 - Wired-network pinning, switching the host's physical monitor off for a stream on request, and the host log that
   Eclipse includes in its diagnostic bundle.
 - Host capabilities (`UmbraCaps`) so Eclipse knows what this host supports.
+- **HidHide**, installed silently by setup, so Eclipse can keep the controllers given to the other co-op PC away from
+  this PC's own games when this PC is one of the two (removed on uninstall only if setup installed it).
+- The mouse cursor is drawn into the stream, and Windows Mouse Keys enabled, only once the client has used a mouse.
 
 [Eclipse/Umbra licence & notices](../LICENSES.md) · [GPL-3.0](../LICENSE)
