@@ -81,6 +81,8 @@ src_assets/common/assets/web-legacy/public/images/logo-apollo-45.png
 src_assets/common/assets/web-legacy/public/images/logo-apollo.svg
 # installer wizard text, product recognition, Quick Tips notes
 packaging/windows/bootstrapper/VibeshineInstaller.cs
+# HidHide runs from setup.exe/uninstall.exe around our MSI (UmbraHidHide.cs): compile it in, rebuild on change
+cmake/targets/windows.cmake
 packaging/windows/bootstrapper/build_bootstrapper.ps1
 packaging/windows/wix/remove_conflicting_products.vbs
 
