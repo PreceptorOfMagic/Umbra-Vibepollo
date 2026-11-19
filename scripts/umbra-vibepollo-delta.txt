@@ -49,6 +49,9 @@ src_assets/windows/misc/firewall/delete-firewall-rule.bat
 src_assets/windows/misc/service/install-service.bat
 # update checks follow Umbra (Vibepollo)'s releases, not Vibepollo's (the tray toast and the web notice)
 cmake/prep/build_version.cmake
+# Vibepollo 2.18 moved the release checks here; both also require an installer asset by name
+src/update_release.h
+src_assets/common/assets/web/utils/updates.ts
 
 # --- identity: legacy (Apollo-era) web UI -- text layer, colours, links, artwork (the tray reads its apollo*.ico)
 src_assets/common/assets/web-legacy/locale.ts
@@ -111,6 +114,15 @@ src/rtsp.h
 src/stream.cpp
 src/video.cpp
 src/video.h
+# Mouse Keys only after the client uses a mouse; cursor drawn into the stream only then (note_client_mouse_input)
+src/input.cpp
+src/platform/windows/misc.cpp
+src/platform/linux/misc.cpp
+src/platform/macos/misc.mm
+# revert the display when the last client disconnects: default ON (config.cpp default + both web UIs + docs)
+src_assets/common/assets/web/configs/settingsSchema.ts
+src_assets/common/assets/web-legacy/stores/config.ts
+docs/configuration.md
 
 # --- build and packaging
 .gitignore

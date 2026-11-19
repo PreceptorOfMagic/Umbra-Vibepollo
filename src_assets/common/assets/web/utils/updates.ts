@@ -5,7 +5,7 @@ import {
   type ChangelogEntry,
   type GitHubReleaseLike,
 } from './changelog.ts';
-import { UMBRA_RELEASES_API, UMBRA_WINDOWS_ASSET } from '@/umbra/edition';  // Umbra
+import { UMBRA_RELEASES_API, UMBRA_WINDOWS_ASSET } from '../umbra/edition.ts';  // Umbra (relative: the legacy UI compiles this file too)
 
 export interface UpdateRelease extends GitHubReleaseLike {
   assets?: { name?: string; state?: string; size?: number }[];
