@@ -53,7 +53,6 @@ elseif(UNIX)
     endif()
 endif()
 
-include_directories(BEFORE SYSTEM "${CMAKE_SOURCE_DIR}/third-party/nv-codec-headers/include")
 file(GLOB NVENC_SOURCES CONFIGURE_DEPENDS "src/nvenc/*.cpp" "src/nvenc/*.h")
 list(APPEND PLATFORM_TARGET_FILES ${NVENC_SOURCES})
 
@@ -96,14 +95,27 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/crypto.h"
         "${CMAKE_SOURCE_DIR}/src/http_pairing_policy.cpp"
         "${CMAKE_SOURCE_DIR}/src/http_pairing_policy.h"
+        "${CMAKE_SOURCE_DIR}/src/pairing_recovery.cpp"
+        "${CMAKE_SOURCE_DIR}/src/pairing_recovery.h"
         "${CMAKE_SOURCE_DIR}/src/remote_session.cpp"
         "${CMAKE_SOURCE_DIR}/src/remote_session.h"
         "${CMAKE_SOURCE_DIR}/src/rtsp_pending_policy.cpp"
         "${CMAKE_SOURCE_DIR}/src/rtsp_pending_policy.h"
         "${CMAKE_SOURCE_DIR}/src/remote_display_topology.cpp"
         "${CMAKE_SOURCE_DIR}/src/remote_display_topology.h"
+        "${CMAKE_SOURCE_DIR}/src/tls_client_identity.cpp"
+        "${CMAKE_SOURCE_DIR}/src/tls_client_identity.h"
+        "${CMAKE_SOURCE_DIR}/src/tls_client_identity_native.cpp"
+        "${CMAKE_SOURCE_DIR}/src/tls_client_identity_native.h"
+        "${CMAKE_SOURCE_DIR}/src/nvhttp_server.h"
         "${CMAKE_SOURCE_DIR}/src/nvhttp.cpp"
         "${CMAKE_SOURCE_DIR}/src/nvhttp.h"
+        "${CMAKE_SOURCE_DIR}/src/nvhttp_dispatch.h"
+        "${CMAKE_SOURCE_DIR}/src/power_action.cpp"
+        "${CMAKE_SOURCE_DIR}/src/power_action.h"
+        "${CMAKE_SOURCE_DIR}/src/power_action_http.h"
+        "${CMAKE_SOURCE_DIR}/src/power_action_native.cpp"
+        "${CMAKE_SOURCE_DIR}/src/nvhttp_bitrate_policy.h"
         "${CMAKE_SOURCE_DIR}/src/httpcommon.cpp"
         "${CMAKE_SOURCE_DIR}/src/http_policy.cpp"
         "${CMAKE_SOURCE_DIR}/src/httpcommon.h"
@@ -123,6 +135,8 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/rtsp.cpp"
         "${CMAKE_SOURCE_DIR}/src/rtsp.h"
         "${CMAKE_SOURCE_DIR}/src/stream.cpp"
+        "${CMAKE_SOURCE_DIR}/src/stream_broadcast_runtime.cpp"
+        "${CMAKE_SOURCE_DIR}/src/stream_broadcast_runtime.h"
         "${CMAKE_SOURCE_DIR}/src/stream_protocol.cpp"
         "${CMAKE_SOURCE_DIR}/src/stream.h"
         "${CMAKE_SOURCE_DIR}/src/video.cpp"
@@ -142,6 +156,13 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/mouse_input.cpp"
         "${CMAKE_SOURCE_DIR}/src/mouse_input.h"
         "${CMAKE_SOURCE_DIR}/src/audio.cpp"
+        "${CMAKE_SOURCE_DIR}/src/audio_context.cpp"
+        "${CMAKE_SOURCE_DIR}/src/audio_context.h"
+        "${CMAKE_SOURCE_DIR}/src/audio_display_transition.h"
+        "${CMAKE_SOURCE_DIR}/src/config_display_transition.h"
+        "${CMAKE_SOURCE_DIR}/src/audio_role_control.h"
+        "${CMAKE_SOURCE_DIR}/src/webrtc_capture_owner.h"
+        "${CMAKE_SOURCE_DIR}/src/platform/audio.h"
         "${CMAKE_SOURCE_DIR}/src/audio.h"
         "${CMAKE_SOURCE_DIR}/src/audio_policy.cpp"
         "${CMAKE_SOURCE_DIR}/src/audio_policy.h"
@@ -156,6 +177,7 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/app_catalog_policy.h"
         "${CMAKE_SOURCE_DIR}/src/steam_integration.cpp"
         "${CMAKE_SOURCE_DIR}/src/steam_integration.h"
+        "${CMAKE_SOURCE_DIR}/src/steam_controller_protocol.h"
         "${CMAKE_SOURCE_DIR}/src/steam_artwork.cpp"
         "${CMAKE_SOURCE_DIR}/src/steam_artwork.h"
         "${CMAKE_SOURCE_DIR}/src/steam_sync_policy.cpp"
@@ -164,6 +186,7 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/steam_auto_sync.h"
         "${CMAKE_SOURCE_DIR}/src/steam_auto_sync_policy.cpp"
         "${CMAKE_SOURCE_DIR}/src/steam_auto_sync_policy.h"
+        "${CMAKE_SOURCE_DIR}/src/managed_app_focus.cpp"
         "${CMAKE_SOURCE_DIR}/src/steam_process_tracker.cpp"
         "${CMAKE_SOURCE_DIR}/src/steam_process_tracker.h"
         "${CMAKE_SOURCE_DIR}/src/lutris_integration.cpp"
@@ -182,6 +205,10 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/app_framegen_config.h"
         "${CMAKE_SOURCE_DIR}/src/platform/linux/smooth_motion_policy.h"
         "${CMAKE_SOURCE_DIR}/src/deferred_action.h"
+        "${CMAKE_SOURCE_DIR}/src/paused_app_monitor.h"
+        "${CMAKE_SOURCE_DIR}/src/process_catalog.cpp"
+        "${CMAKE_SOURCE_DIR}/src/process_catalog.h"
+        "${CMAKE_SOURCE_DIR}/src/process_context.h"
         "${CMAKE_SOURCE_DIR}/src/process.cpp"
         "${CMAKE_SOURCE_DIR}/src/process.h"
         "${CMAKE_SOURCE_DIR}/src/boost_process_shim.cpp"
@@ -223,6 +250,8 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/host_stats.cpp"
         "${CMAKE_SOURCE_DIR}/src/host_stats.h"
         "${CMAKE_SOURCE_DIR}/src/host_stats_service.cpp"
+        "${CMAKE_SOURCE_DIR}/src/hardware_metrics.cpp"
+        "${CMAKE_SOURCE_DIR}/src/hardware_metrics.h"
         "${CMAKE_SOURCE_DIR}/src/host_stats_service.h"
         "${CMAKE_SOURCE_DIR}/src/host_stats_types.h"
         ${PLATFORM_TARGET_FILES})
@@ -322,6 +351,11 @@ include_directories(
         ${Opus_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}  # has to be the last, or we get runtime error on macOS ffmpeg encoder
 )
+
+# Pin the CUDA dispatch ABI after the bulk include list above. FFmpeg bundles
+# may provide an older CudaFunctions layout; every object sharing that table
+# (including TrueHDR and its tests) must use the same repository revision.
+include_directories(BEFORE SYSTEM "${CMAKE_SOURCE_DIR}/third-party/nv-codec-headers/include")
 
 list(APPEND SUNSHINE_EXTERNAL_LIBRARIES
         ${MINIUPNP_LIBRARIES}

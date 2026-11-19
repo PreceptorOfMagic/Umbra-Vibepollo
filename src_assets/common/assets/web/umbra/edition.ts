@@ -8,6 +8,7 @@
 export const PRODUCT_NAME = 'Umbra (Vibepollo)';
 export const UMBRA_REPO = 'https://github.com/PreceptorOfMagic/Umbra-Vibepollo';
 export const UMBRA_RELEASES_API = 'https://api.github.com/repos/PreceptorOfMagic/Umbra-Vibepollo/releases';
+export const UMBRA_WINDOWS_ASSET = 'Umbra-Vibepollo-windows-x64.exe';
 export const UPSTREAM_NAME = 'Vibepollo';
 export const UPSTREAM_REPO = 'https://github.com/Nonary/Vibepollo';
 export const UPSTREAM_RELEASES_API = 'https://api.github.com/repos/Nonary/Vibepollo/releases';
