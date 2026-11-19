@@ -20,5 +20,6 @@ if ($code -eq 0 -or $code -eq 3010) {
     # never need it -- Eclipse sets HidHide up itself -- so the shortcut goes; the tool stays in HidHide's folder.
     Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $env:PUBLIC 'Desktop\HidHide Configuration Client.lnk')
 }
-# 3010 = installed, a restart completes it; NSIS records it without restarting the PC.
+# 3010 = installed, a restart completes it; setup records it without restarting the PC.
+# Run by setup.exe after this product's MSI (packaging/windows/bootstrapper/UmbraHidHide.cs), never from inside it.
 exit $code

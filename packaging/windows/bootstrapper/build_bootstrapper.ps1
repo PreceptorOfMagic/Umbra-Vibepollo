@@ -338,6 +338,7 @@ foreach ($reference in $references) {
 
 $args += $assemblyInfoPath
 $args += $sourceFile
+$args += (Resolve-PathStrict (Join-Path $scriptDir "UmbraHidHide.cs"))  # Umbra: HidHide around our MSI
 
 if ($UninstallOnly) {
     Write-Host "[bootstrapper] Building lightweight uninstaller EXE..."

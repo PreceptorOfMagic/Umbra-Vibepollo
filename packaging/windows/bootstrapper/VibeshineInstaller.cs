@@ -87,7 +87,15 @@ namespace VibepolloInstaller {
       }
 
       if (!parsed.ShowUi) {
+        // Umbra: HidHide around a command-line install or /x (UmbraHidHide.cs)
+        var cliUninstall = string.Equals(parsed.ForwardedArguments.FirstOrDefault(arg =>
+          new[] { "/i", "/package", "/a", "/x", "/uninstall", "/f", "/update" }
+            .Contains(arg, StringComparer.OrdinalIgnoreCase)), "/x", StringComparison.OrdinalIgnoreCase);
+        var cliHidHideCode = cliUninstall ? UmbraHidHide.BeforeUninstall() : 0;
         var cliResult = InstallerRunner.RunCli(parsed);
+        cliResult = cliUninstall
+          ? UmbraHidHide.MergeUninstall(cliResult, cliHidHideCode)
+          : (cliResult != null && cliResult.Operation == InstallerOperation.Install ? UmbraHidHide.AfterInstall(cliResult) : cliResult);
         InstallerRunner.TryWriteInternalInstallResult(parsed.InternalInstallResultPath, cliResult);
         if (!string.IsNullOrWhiteSpace(cliResult.Message)) {
           Console.WriteLine(cliResult.Message);
@@ -3873,7 +3881,8 @@ namespace VibepolloInstaller {
       }
 
       AppendRecoveryDetails(installResult, recoveryDetails);
-      return ApplyStashedPayloadRecovery(installResult, stashedPreviousPayload, "install_restore_previous");
+      return UmbraHidHide.AfterInstall(  // Umbra: HidHide after our MSI (UmbraHidHide.cs)
+        ApplyStashedPayloadRecovery(installResult, stashedPreviousPayload, "install_restore_previous"));
     }
 
     private static bool IsCertificateThumbprint(string value) {
@@ -5794,6 +5803,7 @@ namespace VibepolloInstaller {
 
       SweepStaleInstallerRecoveryDirectories();
 
+      var hidHideCode = UmbraHidHide.BeforeUninstall();  // Umbra: HidHide before our MSI (UmbraHidHide.cs)
       var uninstallResult = UninstallInstalledProducts(
         "uninstall",
         true,
@@ -5804,7 +5814,7 @@ namespace VibepolloInstaller {
         new[] { InstalledProductKind.Vibepollo },
         removeVirtualGamepadDriver);
       uninstallResult.Operation = InstallerOperation.Uninstall;
-      return uninstallResult;
+      return UmbraHidHide.MergeUninstall(uninstallResult, hidHideCode);  // Umbra
     }
 
     public static InstallerResult RunCli(InstallerArguments arguments) {

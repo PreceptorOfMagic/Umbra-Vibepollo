@@ -160,9 +160,6 @@
     <CustomAction Id="InstallVirtualDisplayDriver" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
     <CustomAction Id="InstallVirtualGamepadDriver" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
     <CustomAction Id="InstallUsbIpTransport" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-    <!-- HidHide (Nefarius, MIT): Eclipse keeps controllers given to the other co-op PC away from this PC's games -->
-    <CustomAction Id="InstallHidHide" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-    <CustomAction Id="UninstallHidHide" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
     <CustomAction Id="RegisterVulkanHdrLayer" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
     <CustomAction Id="UpdatePathAdd" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no" />
     <CustomAction Id="UpdatePathRemove" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no" />
@@ -233,13 +230,6 @@
     <CustomAction Id="SetRestoreNvPrefsUndo"
                  Property="RestoreNvPrefsUndo"
                  Value="&quot;[SystemFolder]cmd.exe&quot; /C if exist &quot;[INSTALL_ROOT]sunshine.exe&quot; ( &quot;[INSTALL_ROOT]sunshine.exe&quot; --restore-nvprefs-undo ) else ( exit /b 0 )"/>
-
-    <CustomAction Id="SetInstallHidHide"
-                 Property="InstallHidHide"
-                 Value="&quot;[System64Folder]WindowsPowerShell\v1.0\powershell.exe&quot; -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -File &quot;[INSTALL_ROOT]scripts\install-hidhide.ps1&quot;"/>
-    <CustomAction Id="SetUninstallHidHide"
-                 Property="UninstallHidHide"
-                 Value="&quot;[System64Folder]WindowsPowerShell\v1.0\powershell.exe&quot; -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -File &quot;[INSTALL_ROOT]scripts\uninstall-hidhide.ps1&quot;"/>
 
     <CustomAction Id="SetUninstallSudovda"
                  Property="UninstallSudovda"

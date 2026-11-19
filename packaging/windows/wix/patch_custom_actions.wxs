@@ -96,12 +96,9 @@
            There is intentionally no matching USB/IP uninstall action. -->
       <Custom Action="SetInstallUsbIpTransport" After="InstallVirtualGamepadDriver">NOT REMOVE AND USBIP_TRANSPORT_BUNDLED = "1" AND INSTALL_USBIP_TRANSPORT = "1"</Custom>
       <Custom Action="InstallUsbIpTransport" After="SetInstallUsbIpTransport">NOT REMOVE AND USBIP_TRANSPORT_BUNDLED = "1" AND INSTALL_USBIP_TRANSPORT = "1"</Custom>
-      <!-- HidHide: installed silently unless already present (install-hidhide.ps1); a failure never stops setup -->
-      <Custom Action="SetInstallHidHide" After="InstallUsbIpTransport">NOT REMOVE</Custom>
-      <Custom Action="InstallHidHide" After="SetInstallHidHide">NOT REMOVE</Custom>
       <!-- Vibepollo registers the Vulkan HDR layer on every install (SudoVDA needs it too,
            not just the virtual-display driver), so keep this gated only on NOT REMOVE. -->
-      <Custom Action="SetRegisterVulkanHdrLayer" After="InstallHidHide">NOT REMOVE</Custom>
+      <Custom Action="SetRegisterVulkanHdrLayer" After="InstallUsbIpTransport">NOT REMOVE</Custom>
       <Custom Action="RegisterVulkanHdrLayer" After="SetRegisterVulkanHdrLayer">NOT REMOVE</Custom>
       <!-- Tightened to NOT Installed so repair/upgrade does not rerun install-time migration work. -->
       <Custom Action="SetMigrateConfig" After="RegisterVulkanHdrLayer">NOT Installed AND NOT REMOVE</Custom>
@@ -127,10 +124,6 @@
            opt-in, so the checkbox remains meaningful across package versions. -->
       <Custom Action="SetRemoveVirtualGamepadRoot" After="UninstallVirtualDisplayDriver">REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
       <Custom Action="RemoveVirtualGamepadRoot" After="SetRemoveVirtualGamepadRoot">REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
-      <!-- HidHide goes with this product only if this product installed it (uninstall-hidhide.ps1 checks its marker) -->
-      <Custom Action="SetUninstallHidHide" After="RemoveVirtualGamepadRoot">REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
-      <Custom Action="UninstallHidHide" After="SetUninstallHidHide">REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
-
       <!-- Factory reset only removes known Vibepollo app data. MSI-owned files are removed by MSI itself. -->
       <Custom Action="SetFactoryResetAppData" After="RemoveVirtualGamepadRoot">REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE AND (FACTORYRESET = "1" OR DELETEINSTALLDIR = "1")</Custom>
       <Custom Action="FactoryResetAppData" After="SetFactoryResetAppData">REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE AND (FACTORYRESET = "1" OR DELETEINSTALLDIR = "1")</Custom>

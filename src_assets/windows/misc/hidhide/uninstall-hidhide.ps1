@@ -1,7 +1,8 @@
 # Removes HidHide only when Umbra setup installed it (install-hidhide.ps1 left a marker); a HidHide the user
 # installed before Umbra stays. Never restarts the PC: MEASURED 2026-11-15 on VEGA, removing HidHide through
 # Win32_Product.Uninstall (as uninstall-gamepad.ps1 does for ViGEmBus) returned 1641 and restarted Windows at once.
-# msiexec with REBOOT=ReallySuppress reports 3010 instead, and NSIS offers the restart at the end.
+# msiexec with REBOOT=ReallySuppress reports 3010 instead, which uninstall.exe passes on as a restart request.
+# Run by uninstall.exe / setup.exe before this product's MSI is removed (UmbraHidHide.cs), never from inside it.
 $ErrorActionPreference = 'Stop'
 $marker = Join-Path (Join-Path $env:ProgramData 'Umbra') 'hidhide-installed-by-umbra'
 if (-not (Test-Path $marker)) {
