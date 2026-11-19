@@ -1,12 +1,34 @@
 # HidHide lets Eclipse keep the controllers a player gives to the other co-op PC away from this PC's own games,
 # when this PC is one of the two co-op PCs. It changes nothing on its own: nothing is hidden until Eclipse asks.
 # Installed silently with Umbra, and removed with Umbra only if Umbra installed it (a marker under ProgramData).
+# Run by setup.exe after this product's MSI (packaging/windows/bootstrapper/UmbraHidHide.cs), never from inside it.
 $ErrorActionPreference = 'Stop'
 $markerDir = Join-Path $env:ProgramData 'Umbra'
 $marker = Join-Path $markerDir 'hidhide-installed-by-umbra'
+$retryTask = 'Umbra HidHide install after restart'
+
+function Remove-RetryTask {
+    & schtasks.exe /Delete /TN $retryTask /F 2>$null | Out-Null
+}
 
 if (Get-Service -Name 'HidHide' -ErrorAction SilentlyContinue) {
-    Write-Information 'HidHide is already installed; leaving it as it is.'
+    # A HidHide that was just uninstalled (by Umbra or by hand) keeps its service until Windows restarts: the
+    # service is only marked for deletion. MEASURED 2026-11-19 on VEGA: uninstall, then setup before a restart
+    # skipped HidHide as "already installed", and the restart would have left the PC without it. Install it
+    # once after the restart instead: a one-shot startup task runs this script again as SYSTEM.
+    $deleteFlag = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\HidHide' -Name DeleteFlag -ErrorAction SilentlyContinue).DeleteFlag
+    if ($deleteFlag -eq 1) {
+        $action = "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Path)`""
+        & schtasks.exe /Create /TN $retryTask /SC ONSTART /RU SYSTEM /RL HIGHEST /TR $action /F | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host 'HidHide is pending removal and its after-restart install could not be scheduled.'
+            exit 1
+        }
+        Write-Host 'HidHide is pending removal until Windows restarts; it will be installed after the restart.'
+        exit 3010
+    }
+    Write-Host 'HidHide is already installed; leaving it as it is.'
+    Remove-RetryTask
     exit 0
 }
 
@@ -20,6 +42,8 @@ if ($code -eq 0 -or $code -eq 3010) {
     # never need it -- Eclipse sets HidHide up itself -- so the shortcut goes; the tool stays in HidHide's folder.
     Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $env:PUBLIC 'Desktop\HidHide Configuration Client.lnk')
 }
+# One attempt after a restart, whatever its result: a failing install must not retry at every boot.
+Remove-RetryTask
+Write-Host "HidHide installer exit $code"
 # 3010 = installed, a restart completes it; setup records it without restarting the PC.
-# Run by setup.exe after this product's MSI (packaging/windows/bootstrapper/UmbraHidHide.cs), never from inside it.
 exit $code

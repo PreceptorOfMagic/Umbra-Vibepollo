@@ -24,15 +24,16 @@ namespace VibepolloInstaller {
     private const string UninstallScript = "uninstall-hidhide.ps1";
     private static readonly TimeSpan ScriptTimeout = TimeSpan.FromMinutes(5);
 
-    // After a successful install or upgrade. Leaves the result as it is: HidHide's install needs no restart
-    // (measured 2026-11-15 on VEGA) and a failure only means Eclipse cannot hide pads on this PC.
+    // After a successful install or upgrade. A failure leaves the result as it is (it only means Eclipse cannot
+    // hide pads on this PC). 3010 -- HidHide still pending removal from an uninstall, so the script scheduled its
+    // install for after the restart, or HidHide's own installer asked for one -- becomes a restart request.
     public static InstallerResult AfterInstall(InstallerResult result) {
       if (result == null || !result.Succeeded || !IsElevated()) {
         return result;
       }
       var script = FindScript(InstallScript, false);
-      if (script != null) {
-        RunScript(script, "install");
+      if (script != null && RunScript(script, "install") == 3010 && result.ExitCode == 0) {
+        result.ExitCode = 3010;
       }
       return result;
     }

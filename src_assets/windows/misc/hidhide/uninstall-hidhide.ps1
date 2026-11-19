@@ -5,6 +5,8 @@
 # Run by uninstall.exe / setup.exe before this product's MSI is removed (UmbraHidHide.cs), never from inside it.
 $ErrorActionPreference = 'Stop'
 $marker = Join-Path (Join-Path $env:ProgramData 'Umbra') 'hidhide-installed-by-umbra'
+# An after-restart install scheduled by install-hidhide.ps1 must not outlive this product (its script goes with it).
+& schtasks.exe /Delete /TN 'Umbra HidHide install after restart' /F 2>$null | Out-Null
 if (-not (Test-Path $marker)) {
     Write-Information 'HidHide was not installed by Umbra; leaving it.'
     exit 0
@@ -22,6 +24,9 @@ try {
         if ($p.ExitCode -eq 3010) { $result = 3010 }
     }
     if ($codes.Count -eq 0) { Write-Information 'HidHide not found' }
+    # msiexec answers 0 while HidHide's service is only marked for deletion and still running (MEASURED
+    # 2026-11-19 on VEGA): the removal completes at the next restart, so ask for one.
+    if ($codes.Count -gt 0 -and (Get-Service -Name 'HidHide' -ErrorAction SilentlyContinue)) { $result = 3010 }
     Remove-Item -Force $marker
     exit $result
 } catch {
