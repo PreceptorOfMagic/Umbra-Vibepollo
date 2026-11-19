@@ -8,20 +8,35 @@ $marker = Join-Path $markerDir 'hidhide-installed-by-umbra'
 $retryTask = 'Umbra HidHide install after restart'
 
 function Remove-RetryTask {
-    & schtasks.exe /Delete /TN $retryTask /F 2>$null | Out-Null
+    Unregister-ScheduledTask -TaskName $retryTask -Confirm:$false -ErrorAction SilentlyContinue
 }
+
+# Runs this script once, elevated, when an administrator next signs in -- the context setup.exe runs in, where
+# HidHide installs in seconds. NOT as SYSTEM: MEASURED 2026-11-19 on VEGA, HidHide's installer run as SYSTEM never
+# finishes (its RegisterUpdater action, nefarius_HidHide_Updater.exe --install, sits idle; the same at boot and with
+# no restart at all). The ScheduledTasks cmdlets, not schtasks /TR: PowerShell 5.1 splits a quoted path with spaces
+# passed to schtasks.exe (MEASURED the same day).
+function Register-RetryTask {
+    $action = New-ScheduledTaskAction -Execute 'powershell.exe' `
+        -Argument "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    $trigger = New-ScheduledTaskTrigger -AtLogOn
+    $principal = New-ScheduledTaskPrincipal -GroupId 'S-1-5-32-544' -RunLevel Highest  # BUILTIN\Administrators
+    Register-ScheduledTask -TaskName $retryTask -Action $action -Trigger $trigger -Principal $principal -Force | Out-Null
+}
+
+$runningAsSystem = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value -eq 'S-1-5-18'
 
 if (Get-Service -Name 'HidHide' -ErrorAction SilentlyContinue) {
     # A HidHide that was just uninstalled (by Umbra or by hand) keeps its service until Windows restarts: the
     # service is only marked for deletion. MEASURED 2026-11-19 on VEGA: uninstall, then setup before a restart
     # skipped HidHide as "already installed", and the restart would have left the PC without it. Install it
-    # once after the restart instead: a one-shot startup task runs this script again as SYSTEM.
+    # once after the restart instead, at the next administrator sign-in (Register-RetryTask).
     $deleteFlag = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\HidHide' -Name DeleteFlag -ErrorAction SilentlyContinue).DeleteFlag
     if ($deleteFlag -eq 1) {
-        $action = "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Path)`""
-        & schtasks.exe /Create /TN $retryTask /SC ONSTART /RU SYSTEM /RL HIGHEST /TR $action /F | Out-Null
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host 'HidHide is pending removal and its after-restart install could not be scheduled.'
+        try {
+            Register-RetryTask
+        } catch {
+            Write-Host "HidHide is pending removal and its after-restart install could not be scheduled: $_"
             exit 1
         }
         Write-Host 'HidHide is pending removal until Windows restarts; it will be installed after the restart.'
@@ -29,6 +44,16 @@ if (Get-Service -Name 'HidHide' -ErrorAction SilentlyContinue) {
     }
     Write-Host 'HidHide is already installed; leaving it as it is.'
     Remove-RetryTask
+    exit 0
+}
+
+if ($runningAsSystem) {
+    # Setup run as SYSTEM (a deployment tool): never start HidHide's installer here, it would hang (see above).
+    try { Register-RetryTask } catch {
+        Write-Host "Running as SYSTEM; HidHide's install could not be scheduled for the next administrator sign-in: $_"
+        exit 1
+    }
+    Write-Host 'Running as SYSTEM; HidHide will be installed when an administrator next signs in.'
     exit 0
 }
 

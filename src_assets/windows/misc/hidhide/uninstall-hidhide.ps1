@@ -6,7 +6,7 @@
 $ErrorActionPreference = 'Stop'
 $marker = Join-Path (Join-Path $env:ProgramData 'Umbra') 'hidhide-installed-by-umbra'
 # An after-restart install scheduled by install-hidhide.ps1 must not outlive this product (its script goes with it).
-& schtasks.exe /Delete /TN 'Umbra HidHide install after restart' /F 2>$null | Out-Null
+Unregister-ScheduledTask -TaskName 'Umbra HidHide install after restart' -Confirm:$false -ErrorAction SilentlyContinue
 if (-not (Test-Path $marker)) {
     Write-Information 'HidHide was not installed by Umbra; leaving it.'
     exit 0
